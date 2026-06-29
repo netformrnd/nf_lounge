@@ -2555,6 +2555,10 @@
       <div class="emp-pick-body">
         <input id="empPickSearch" type="text" class="emp-pick-search" placeholder="이름·부서 검색" />
         <div id="empPickChips" class="emp-pick-chips"></div>
+        <div style="display:flex;gap:8px;margin:2px 0 6px;">
+          <button type="button" id="empPickAll" style="font-size:12px;font-weight:800;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:var(--blue);">전체 선택</button>
+          <button type="button" id="empPickNone" style="font-size:12px;font-weight:800;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:var(--muted);">전체 해제</button>
+        </div>
         <div id="empPickList" class="emp-pick-list"></div>
         <div class="modal-actions">
           <button type="button" class="btn-ghost" id="empPickCancel">취소</button>
@@ -2577,8 +2581,14 @@
       try{localStorage.setItem("lounge_perms",JSON.stringify(p));}catch(e){}
       if(window.__db){ window.__db.collection("lounge_perms").doc("config").set({map:p}).catch(function(err){ console.error("[lounge] 권한 저장 실패:", err); alert("권한 저장에 실패했습니다. 네트워크를 확인해주세요."); }); }
     }
-    var EMP=window.EMPLOYEES||[]; var BY={}; EMP.forEach(function(e){BY[e.id]=e;});
-    var EMP_SORTED=EMP.slice().sort(function(a,b){return (a.dept||"").localeCompare(b.dept||"","ko")||(a.name||"").localeCompare(b.name||"","ko");});
+    var EMP=[], BY={}, EMP_SORTED=[];
+    function refreshEmp(){
+      /* 계정현황과 동일 소스: Firestore lounge_users(실시간) → employees.js 폴백 */
+      EMP = (window.__loungeUsers && window.__loungeUsers.length) ? window.__loungeUsers : (window.EMPLOYEES||[]);
+      BY={}; EMP.forEach(function(e){ if(e&&e.id!=null) BY[String(e.id)]=e; });
+      EMP_SORTED=EMP.slice().sort(function(a,b){return (a.dept||"").localeCompare(b.dept||"","ko")||(a.name||"").localeCompare(b.name||"","ko");});
+    }
+    refreshEmp();
     function empName(id){var e=BY[id];return e?e.name:id;}
     function curIds(id){var x=loadP()[id];return (x&&x.ids)||[];}
     function persist(id,mode,ids){var all=loadP();all[id]={mode:mode,ids:ids};saveP(all);if(window.__refreshGuide)window.__refreshGuide();renderPerm();}
@@ -2615,13 +2625,15 @@
       });
     }
     function renderPickList(f){if(!pickList)return;clr(pickList);f=(f||"").trim();var last=null;EMP_SORTED.forEach(function(e){if(f&&(e.name+e.dept+(e.position||"")).indexOf(f)===-1)return;if(e.dept!==last){last=e.dept;pickList.appendChild(mk("div",{class:"emp-pick-dept",text:e.dept||"(부서 없음)"}));}var cb=mk("input",{type:"checkbox",value:e.id});if(pickSel[e.id])cb.checked=true;cb.addEventListener("change",function(){ if(cb.checked)pickSel[e.id]=true; else delete pickSel[e.id]; renderChips(); });pickList.appendChild(mk("label",{class:"emp-pick-item"},[cb,mk("span",{text:e.name})]));});}
-    function openPick(t,checked,apply){onApply=apply;if(title)title.textContent="인원 선택 — "+t;if(search)search.value="";pickSel={};(checked||[]).forEach(function(id){pickSel[String(id)]=true;});renderChips();renderPickList("");if(modal)modal.hidden=false;}
+    function openPick(t,checked,apply){onApply=apply;refreshEmp();if(title)title.textContent="인원 선택 — "+t;if(search)search.value="";pickSel={};(checked||[]).forEach(function(id){pickSel[String(id)]=true;});renderChips();renderPickList("");if(modal)modal.hidden=false;}
     function closePick(){if(modal)modal.hidden=true;onApply=null;}
     if(search)search.addEventListener("input",function(){renderPickList(search.value);});
     if(el("empPickClose"))el("empPickClose").addEventListener("click",closePick);
     if(el("empPickCancel"))el("empPickCancel").addEventListener("click",closePick);
     if(modal)modal.addEventListener("click",function(e){if(e.target===modal)closePick();});
     if(el("empPickApply"))el("empPickApply").addEventListener("click",function(){var ids=Object.keys(pickSel);if(onApply)onApply(ids);closePick();});
+    if(el("empPickAll"))el("empPickAll").addEventListener("click",function(){ refreshEmp(); EMP_SORTED.forEach(function(e){ if(e&&e.id!=null) pickSel[String(e.id)]=true; }); renderChips(); renderPickList(search?search.value:""); });
+    if(el("empPickNone"))el("empPickNone").addEventListener("click",function(){ pickSel={}; renderChips(); renderPickList(search?search.value:""); });
 
     /* 공통: 모드 select + 인원선택 버튼 */
     function modeControls(it){

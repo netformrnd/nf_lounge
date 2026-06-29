@@ -2234,12 +2234,25 @@
     function loadFavs(){ try{var r=localStorage.getItem(FAV_KEY); if(r)return JSON.parse(r);}catch(e){} return ["hr-portal","calendar"]; }
     var favs=loadFavs();
     function saveFavs(){ try{localStorage.setItem(FAV_KEY,JSON.stringify(favs));}catch(e){} }
+    /* 계정별 즐겨찾기: Firestore lounge_favs/{사번}.items 에 저장 → 기기·브라우저 바뀌어도 유지 */
+    function favUid(){ var u=window.__loungeUser; return (u&&u.id)?String(u.id):null; }
+    function loadUserFavs(){
+      var id=favUid(); if(!id || !window.__db) return;
+      window.__db.collection("lounge_favs").doc(id).get().then(function(d){
+        if(d.exists && d.data() && Array.isArray(d.data().items)){ favs=d.data().items; saveFavs(); renderSide(); syncStars(); }
+      }).catch(function(e){ console.warn("[lounge] 즐겨찾기 로드 실패", e); });
+    }
+    function saveUserFavs(){
+      var id=favUid(); if(!id || !window.__db) return;
+      window.__db.collection("lounge_favs").doc(id).set({ items:favs }).catch(function(e){ console.warn("[lounge] 즐겨찾기 저장 실패", e); });
+    }
+    window.__loadUserFavs=loadUserFavs;
     function isFav(id){ return favs.indexOf(id)!==-1; }
     function syncStars(){
       var b=document.querySelectorAll(".fav-star[data-fav]");
       for(var i=0;i<b.length;i++){ var on=isFav(b[i].getAttribute("data-fav")); b[i].classList.toggle("on",on); b[i].textContent=on?"★":"☆"; }
     }
-    function toggleFav(id){ var i=favs.indexOf(id); if(i===-1)favs.push(id); else favs.splice(i,1); saveFavs(); renderSide(); syncStars(); }
+    function toggleFav(id){ var i=favs.indexOf(id); if(i===-1)favs.push(id); else favs.splice(i,1); saveFavs(); saveUserFavs(); renderSide(); syncStars(); }
 
     function itemRow(it){
       return h("div",{class:"screen-link","data-open":it.id},[
@@ -2438,6 +2451,7 @@
       var at=el("adminTab"); if(at) at.style.display = (u.role==="admin") ? "" : "none";
       window.__loungeUser = u;                 // 권한 필터(canSeeRes)가 이 사용자 기준으로 동작
       if(window.__refreshGuide) window.__refreshGuide();
+      if(window.__loadUserFavs) window.__loadUserFavs();   // 계정별 즐겨찾기 불러오기
       renderAdmin();
       if(window.__refreshNotices) window.__refreshNotices();
       if(u && u.pwChanged===false) openPwGate(true);   // 첫 로그인(기본비번) → 변경 강제
@@ -2497,7 +2511,7 @@
     });
     if(el("logoutBtn")) el("logoutBtn").addEventListener("click",function(){ localStorage.removeItem(SSO_KEY); localStorage.removeItem(SES); sessionStorage.removeItem(SSO_KEY); sessionStorage.removeItem(SES); location.reload(); });
     /* Firestore 공용계정이 늦게 도착하면, 이미 로그인한 사용자 정보를 그 시점에 다시 반영 */
-    window.__onUsersLoaded=function(){ var u=curUser(); if(u){ window.__loungeUser=u; if(window.__refreshGuide) window.__refreshGuide(); } };
+    window.__onUsersLoaded=function(){ var u=curUser(); if(u){ window.__loungeUser=u; if(window.__refreshGuide) window.__refreshGuide(); if(window.__loadUserFavs) window.__loadUserFavs(); } };
 
     var form=el("voiceForm");
     if(form){

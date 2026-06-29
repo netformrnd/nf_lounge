@@ -2689,6 +2689,7 @@
       });
     }
     function renderPerm(){
+      refreshEmp();   // lounge_users 최신 반영 → 칩을 아이디가 아닌 이름으로 표시
       var box=el("permList"); if(!box||!window.GUIDE) return; clr(box);
       if(PERM_LAYOUT==="summary") renderSummary(box);
       else if(PERM_LAYOUT==="cards") renderCards(box);
@@ -2696,6 +2697,8 @@
     }
     window.__renderPerm = renderPerm;   // 권한 Firestore 구독이 갱신 시 호출
     renderPerm();
+    var __permPrevOnUsers = window.__onUsersLoaded;   // 계정(lounge_users) 로드 후 이름으로 재렌더
+    window.__onUsersLoaded = function(){ if(typeof __permPrevOnUsers==="function") __permPrevOnUsers(); renderPerm(); };
   })();
   </script>
 

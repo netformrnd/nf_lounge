@@ -1146,6 +1146,8 @@
     .side-fav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px; cursor: pointer; color: #2a405e; font-size: 12.5px; font-weight: 800; }
     .side-fav-item:hover { background: #f3f8ff; color: var(--blue); }
     .side-fav-item .fs { color: var(--amber); font-size: 12px; flex-shrink: 0; }
+    .side-fav-star { cursor: pointer; }
+    .side-fav-item .side-fav-star:hover { color: var(--coral); }
     .side-fav-empty { padding: 4px 10px; font-size: 11.5px; font-weight: 700; color: var(--weak); line-height: 1.5; }
 
     /* 업무 가이드 항목에 즐겨찾기 별 */
@@ -2343,7 +2345,7 @@
       var w=el("sideFav"); if(!w)return; clear(w);
       var items=favs.map(function(id){return MAP[id];}).filter(Boolean).filter(function(it){return canSeeRes(it.id);});
       if(!items.length){ w.appendChild(h("p",{class:"side-fav-empty",text:"★를 눌러 자주 쓰는 화면을 추가하세요."})); return; }
-      items.forEach(function(it){ w.appendChild(h("div",{class:"side-fav-item","data-open":it.id},[ h("span",{class:"fs",text:"★"}), h("span",{text:it.t}) ])); });
+      items.forEach(function(it){ w.appendChild(h("div",{class:"side-fav-item","data-open":it.id},[ h("span",{class:"fs side-fav-star","data-fav":it.id,title:"즐겨찾기 해제",text:"★"}), h("span",{text:it.t}) ])); });
     }
 
     renderGuide("guideGrid", true); renderGuide("guideGridTab", false); renderSide(); syncStars();
@@ -2351,6 +2353,8 @@
     document.addEventListener("click", function(e){
       var star=e.target.closest(".fav-star[data-fav]");
       if(star){ e.preventDefault(); e.stopPropagation(); toggleFav(star.getAttribute("data-fav")); return; }
+      var sfav=e.target.closest(".side-fav-star[data-fav]");
+      if(sfav){ e.preventDefault(); e.stopPropagation(); toggleFav(sfav.getAttribute("data-fav")); return; }
       var op=e.target.closest("[data-open]");
       if(op){ var it=MAP[op.getAttribute("data-open")]; if(it && it.url && it.url!=="#") window.open(it.url,"_blank","noopener"); }
     });

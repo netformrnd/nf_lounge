@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사내 웹서비스 개발 보안 가이드라인</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:#f0f4f8;color:#1e293b;-webkit-font-smoothing:antialiased;}
+.page{max-width:760px;margin:0 auto;padding:40px 20px 60px;}
+.top-badge{display:inline-flex;align-items:center;gap:6px;background:#0f172a;color:#94a3b8;font-size:10px;font-weight:700;padding:4px 12px;border-radius:100px;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.top-badge span{color:#38bdf8;}
+h1{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:6px;line-height:1.3;}
+.subtitle{font-size:14px;color:#64748b;margin-bottom:12px;line-height:1.6;}
+.meta{font-size:12px;color:#94a3b8;margin-bottom:32px;display:flex;gap:16px;flex-wrap:wrap;}
+.card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:28px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-num{font-size:11px;font-weight:800;color:#94a3b8;letter-spacing:1px;margin-bottom:8px;}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.card-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.card-title{font-size:17px;font-weight:700;color:#0f172a;}
+.card-desc{font-size:13px;color:#64748b;margin-top:2px;}
+.why{background:#f8fafc;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#475569;line-height:1.7;}
+.rule{display:flex;gap:10px;padding:10px 14px;background:#f8fafc;border-radius:10px;margin-bottom:8px;font-size:13px;line-height:1.7;color:#334155;align-items:flex-start;}
+.rule .icon{font-size:15px;flex-shrink:0;margin-top:2px;}
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.do-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;font-size:12px;line-height:1.8;color:#166534;}
+.dont-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;font-size:12px;line-height:1.8;color:#991b1b;}
+.do-box .label,.dont-box .label{font-size:11px;font-weight:700;margin-bottom:6px;}
+.highlight{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-top:14px;font-size:13px;color:#1e40af;line-height:1.7;}
+/* Claude prompt box */
+.claude-prompt{background:#1a1a2e;border:1px solid #2d2d4a;border-radius:12px;padding:16px 18px;margin-top:16px;}
+.claude-prompt-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.claude-prompt-logo{width:22px;height:22px;border-radius:6px;background:#d4a574;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#1a1a2e;}
+.claude-prompt-label{font-size:11px;font-weight:700;color:#8b8bab;letter-spacing:0.5px;}
+.claude-prompt-text{background:#12121f;border:1px solid #2d2d4a;border-radius:8px;padding:12px 14px;font-size:13px;color:#c8c8e0;line-height:1.7;font-family:'Pretendard',sans-serif;cursor:pointer;position:relative;transition:border-color .15s;}
+.claude-prompt-text:hover{border-color:#4a4a6a;}
+.claude-prompt-text::after{content:'click to copy';position:absolute;top:8px;right:10px;font-size:9px;color:#4a4a6a;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;}
+.claude-prompt-text.copied::after{content:'copied!';color:#22c55e;}
+/* Code toggle */
+.code-toggle{margin-top:12px;}
+.code-toggle-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid #e2e8f0;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s;}
+.code-toggle-btn:hover{background:#f8fafc;border-color:#cbd5e1;color:#334155;}
+.code-toggle-btn .arrow{font-size:10px;transition:transform .2s;}
+.code-toggle-btn.open .arrow{transform:rotate(180deg);}
+.code-content{display:none;margin-top:8px;}
+.code-content.open{display:block;}
+.code-block{background:#1e293b;border-radius:10px;padding:16px 18px;margin:8px 0;overflow-x:auto;}
+.code-block code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;color:#e2e8f0;line-height:1.8;white-space:pre;}
+.code-label{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.code-label .dot{width:8px;height:8px;border-radius:50%;}
+/* Summary */
+.summary{background:#0f172a;border-radius:16px;padding:28px;margin-top:24px;color:#e2e8f0;}
+.summary h3{font-size:16px;font-weight:700;margin-bottom:14px;color:#fff;}
+.summary-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;line-height:1.6;}
+.summary-item:last-child{border-bottom:none;}
+.summary-item .s-num{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.footer{text-align:center;margin-top:32px;padding-top:20px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;}
+@media(max-width:640px){.page{padding:24px 14px 40px;}h1{font-size:22px;}.card{padding:20px;}.do-dont{grid-template-columns:1fr;}.code-block{padding:12px 14px;}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top-badge"><span>DEV</span> SECURITY GUIDELINE</div>
+  <h1>사내 웹서비스 개발<br>보안 가이드라인</h1>
+  <p class="subtitle">사내 웹서비스(HTML/JS + Firebase)를 개발할 때 적용해야 할 보안 기준입니다.<br>LinkHub 구축 과정에서 적용한 사례를 기반으로 정리했습니다.</p>
+  <div class="meta">
+    <span>2026.03</span>
+    <span>경영관리팀</span>
+    <span>v1.0</span>
+  </div>
+
+  <!-- RULE 01 -->
+  <div class="card">
+    <div class="card-num">RULE 01</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#eff6ff;color:#2563eb;">&#128274;</div>
+      <div>
+        <div class="card-title">비밀번호는 반드시 해시로 저장</div>
+        <div class="card-desc">평문(Plain Text) 저장 절대 금지</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> 비밀번호를 그대로 저장하면, 누군가 DB를 열어봤을 때 모든 계정 비밀번호가 그대로 보입니다. 해시로 저장하면 의미 없는 암호문만 보여서 원래 비밀번호를 알 수 없습니다.</div>
+    <div class="rule"><span class="icon">&#128274;</span><span>비밀번호 원문은 코드에도, DB에도 절대 저장하지 마세요. <b>SHA-256 해시</b>로 변환 후 저장하고, 로그인 시에는 입력값의 해시와 저장된 해시를 비교합니다.</span></div>
+    <div class="highlight"><b>적용 효과:</b> 해커가 DB를 탈취해도 비밀번호 원문을 알 수 없습니다. 관리자도 비밀번호를 볼 수 없어 내부 유출 위험도 차단됩니다. (LinkHub에 적용 완료)</div>
+    <div class="do-dont">
+      <div class="do-box"><div class="label">DO</div>SHA-256 해시로 변환 후 저장<br>비교는 해시 vs 해시로만<br>비밀번호 원문은 어디에도 없게</div>
+      <div class="dont-box"><div class="label">DON'T</div>HTML/JS에 비밀번호 하드코딩<br>Firebase에 평문 비밀번호 저장<br>console.log()로 비밀번호 출력</div>
+    </div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"비밀번호를 SHA-256 해시로 변환해서 Firebase에 저장하고, 로그인 시 해시 비교로 검증하는 방식으로 구현해줘. 코드에 평문 비밀번호 하드코딩하지 말고."</div>
+    </div>
+    <div class="code-toggle">
+      <button class="code-toggle-btn" onclick="toggleCode(this)"><span class="arrow">&#9660;</span> 코드 예시 보기</button>
+      <div class="code-content">
+        <div class="code-label"><span class="dot" style="background:#22c55e;"></span> SHA-256 해시 저장/검증</div>
+        <div class="code-block"><code>// SHA-256 해시 변환 함수
+async function sha256(str) {
+  const buf = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(str)
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(b =&gt; b.toString(16).padStart(2,'0'))
+    .join('');
+}
+
+// 저장: 해시만 저장
+const hash = await sha256('비밀번호');
+db.collection('passwords').doc('teamA')
+  .set({ hash: hash });
+
+// 검증: 해시끼리 비교
+const inputHash = await sha256(입력값);
+if (inputHash === 저장된해시) {
+  // 로그인 성공
+}</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 02 -->
+  <div class="card">
+    <div class="card-num">RULE 02</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#fef3c7;color:#d97706;">&#128737;</div>
+      <div>
+        <div class="card-title">Firebase Security Rules 필수 설정</div>
+        <div class="card-desc">데이터 접근 범위를 반드시 제한</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> 우리 사이트의 소스코드를 열면 Firebase 접속 정보가 보입니다. 보안 규칙이 없으면 이 정보만으로 누구든 우리 데이터를 몽땅 지워버릴 수 있습니다.</div>
+    <div class="rule"><span class="icon">&#128737;</span><span><b>내 서비스가 사용하는 데이터 영역만 허용</b>하고, 나머지는 전부 차단해야 합니다. Firebase 콘솔 &gt; Firestore &gt; 규칙 탭에서 설정합니다.</span></div>
+    <div class="rule"><span class="icon">&#128204;</span><span>여러 서비스가 같은 Firebase를 쓸 경우, 데이터 이름에 <b>접두사</b>를 붙여 구분하세요. (예: portal-links, hr-employees)</span></div>
+    <div class="highlight"><b>적용 효과:</b> 외부인이 API 키를 알아내도 허용된 데이터만 접근 가능합니다. 다른 서비스의 데이터는 완전히 보호됩니다. 마치 건물 출입증처럼, 특정 층만 출입 가능하게 설정하는 것입니다.</div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"Firebase Security Rules를 설정해줘. 내 서비스에서 사용하는 컬렉션(예: my-service-links, my-service-settings)만 읽기/쓰기 허용하고, 나머지 컬렉션은 전부 차단해줘."</div>
+    </div>
+    <div class="code-toggle">
+      <button class="code-toggle-btn" onclick="toggleCode(this)"><span class="arrow">&#9660;</span> 코드 예시 보기</button>
+      <div class="code-content">
+        <div class="code-label"><span class="dot" style="background:#22c55e;"></span> Security Rules 설정</div>
+        <div class="code-block"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 내 서비스 전용 컬렉션만 허용
+    match /my-service-links/{doc} {
+      allow read, write: if true;
+    }
+    match /my-service-settings/{doc} {
+      allow read, write: if true;
+    }
+    // 나머지는 전부 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 03 -->
+  <div class="card">
+    <div class="card-num">RULE 03</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#faf5ff;color:#7c3aed;">&#128272;</div>
+      <div>
+        <div class="card-title">API 키 노출 최소화</div>
+        <div class="card-desc">소스코드에 민감 정보 직접 노출 주의</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> GitHub Pages에 올리는 HTML은 누구나 소스를 볼 수 있습니다. Firebase API 키는 노출이 불가피하지만, 결제나 메일 발송 같은 API 키가 노출되면 무단 결제나 스팸 발송이 발생할 수 있습니다.</div>
+    <div class="do-dont">
+      <div class="dont-box"><div class="label">코드에 넣으면 안 되는 것</div>결제 API 키 (PG사 시크릿 키)<br>이메일 발송 API 키<br>관리자/DB 접속 비밀번호<br>개인정보 (전화번호, 주민번호 등)</div>
+      <div class="do-box"><div class="label">코드에 있어도 괜찮은 것</div>Firebase API 키 (Rules로 보호 시)<br>Google Maps API 키 (도메인 제한 시)<br>공개 CDN 주소<br>서비스 설정값 (색상, 텍스트 등)</div>
+    </div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"이 코드에서 소스코드에 노출되면 안 되는 민감 정보(API 키, 비밀번호 등)가 있는지 검토해줘. 있으면 안전한 방식으로 대체해줘."</div>
+    </div>
+  </div>
+
+  <!-- RULE 04 -->
+  <div class="card">
+    <div class="card-num">RULE 04</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#f0fdf4;color:#16a34a;">&#128220;</div>
+      <div>
+        <div class="card-title">사용자 입력값은 항상 검증</div>
+        <div class="card-desc">XSS 방지 + 데이터 정합성</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> 입력창에 악성 코드를 넣으면 다른 사용자 화면에서 그 코드가 실행될 수 있습니다. 쉽게 말해, 누군가 입력창에 "바이러스"를 심으면 접속하는 모든 사람이 감염되는 것입니다.</div>
+    <div class="rule"><span class="icon">&#128220;</span><span>사용자 입력값을 화면에 표시할 때는 반드시 <b>안전하게 변환(이스케이프)</b>해달라고 요청하세요. URL도 올바른 형식인지 검증하세요.</span></div>
+    <div class="highlight"><b>적용 효과:</b> 악의적인 입력이 들어와도 단순 텍스트로 표시되어 피해가 없습니다. 잘못된 URL 입력도 사전에 차단되어 깨진 링크가 등록되지 않습니다.</div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"사용자 입력값이 HTML에 들어가는 부분에 XSS 방지를 위한 이스케이프 처리를 해줘. URL 입력 필드에는 유효성 검사도 추가해줘."</div>
+    </div>
+    <div class="code-toggle">
+      <button class="code-toggle-btn" onclick="toggleCode(this)"><span class="arrow">&#9660;</span> 코드 예시 보기</button>
+      <div class="code-content">
+        <div class="code-label"><span class="dot" style="background:#22c55e;"></span> 이스케이프 + URL 검증</div>
+        <div class="code-block"><code>// HTML 특수문자 이스케이프
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&amp;/g, '&amp;amp;')
+          .replace(/&lt;/g, '&amp;lt;')
+          .replace(/&gt;/g, '&amp;gt;')
+          .replace(/"/g, '&amp;quot;');
+}
+
+// URL 유효성 검사
+function isValidUrl(s) {
+  try { new URL(s); return true; }
+  catch { return false; }
+}
+
+// 안전한 사용
+element.textContent = userInput; // 안전
+// 위험한 사용
+element.innerHTML = userInput;   // 위험!</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 05 -->
+  <div class="card">
+    <div class="card-num">RULE 05</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#fef3c7;color:#b45309;">&#128451;</div>
+      <div>
+        <div class="card-title">Firebase 컬렉션 이름 규칙</div>
+        <div class="card-desc">추측하기 어려운 이름 사용</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> Firebase 데이터 이름을 "users", "passwords"처럼 누구나 추측 가능한 이름으로 만들면, 외부에서 해당 이름으로 직접 데이터에 접근을 시도할 수 있습니다.</div>
+    <div class="rule"><span class="icon">&#10060;</span><span><b>피해야 할 이름:</b> users, passwords, data, settings, admin</span></div>
+    <div class="rule"><span class="icon">&#9989;</span><span><b>권장 이름:</b> 서비스명-기능 형태로 접두사 붙이기 (예: portal-pw, hr-employees, kpi-scores)</span></div>
+    <div class="highlight"><b>적용 효과:</b> 데이터 이름만으로는 어떤 서비스의 어떤 데이터인지 외부에서 추측하기 어렵습니다. 같은 Firebase에 여러 서비스를 운영할 때 데이터가 섞이는 것도 방지합니다. (LinkHub 적용 완료: portal-links, portal-pw 등)</div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"Firebase 컬렉션 이름을 서비스명-기능 형태의 접두사 방식으로 변경해줘. 예를 들어 users 대신 myapp-users 형태로."</div>
+    </div>
+  </div>
+
+  <!-- RULE 06 -->
+  <div class="card">
+    <div class="card-num">RULE 06</div>
+    <div class="card-header">
+      <div class="card-icon" style="background:#fef2f2;color:#dc2626;">&#128187;</div>
+      <div>
+        <div class="card-title">개발자도구(F12) 우회 방지</div>
+        <div class="card-desc">콘솔에서 함수 직접 호출 차단</div>
+      </div>
+    </div>
+    <div class="why"><b>왜?</b> 브라우저에서 F12를 누르면 개발자도구가 열립니다. 여기서 로그인 함수를 직접 호출하면 비밀번호 없이 접속할 수 있습니다. 주요 함수에 인증 상태 체크를 추가해야 합니다.</div>
+    <div class="rule"><span class="icon">&#128274;</span><span>로그인 후 실행되는 주요 함수(화면 렌더링, 데이터 추가/수정/삭제)에 <b>"로그인했는가?"</b> 체크를 추가하세요. 로그인하지 않았으면 함수가 실행되지 않게 합니다.</span></div>
+    <div class="highlight"><b>적용 효과:</b> 개발자도구에서 함수를 직접 호출해도, 정상 로그인 없이는 아무 기능도 동작하지 않습니다. 비밀번호를 모르면 접근 자체가 불가합니다. (LinkHub 적용 완료)</div>
+    <div class="claude-prompt">
+      <div class="claude-prompt-header">
+        <div class="claude-prompt-logo">C</div>
+        <div class="claude-prompt-label">CLAUDE CODE 요청 예시</div>
+      </div>
+      <div class="claude-prompt-text" onclick="copyPrompt(this)">"로그인 인증 상태를 변수로 관리하고, 주요 함수(화면 렌더링, 데이터 CRUD, 관리자 기능)에 인증 체크를 추가해줘. 로그인하지 않은 상태에서 콘솔로 함수를 호출해도 동작하지 않게."</div>
+    </div>
+    <div class="code-toggle">
+      <button class="code-toggle-btn" onclick="toggleCode(this)"><span class="arrow">&#9660;</span> 코드 예시 보기</button>
+      <div class="code-content">
+        <div class="code-label"><span class="dot" style="background:#22c55e;"></span> 인증 체크 패턴</div>
+        <div class="code-block"><code>var _authenticated = false;
+
+// 로그인 성공 시
+function handleLogin() {
+  // 비밀번호 검증 후...
+  _authenticated = true;
+  showMainScreen();
+}
+
+// 주요 함수에 체크 추가
+function renderScreen() {
+  if (!_authenticated) return; // 미인증 시 중단
+  // ... 화면 렌더링
+}
+
+// 로그아웃 시
+function logout() {
+  _authenticated = false;
+}</code></div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- 요약 -->
+  <div class="summary">
+    <h3>배포 전 체크리스트</h3>
+    <div class="summary-item"><span class="s-num" style="background:rgba(239,68,68,0.2);color:#fca5a5;">1</span>비밀번호를 평문으로 저장하고 있지 않은가?</div>
+    <div class="summary-item"><span class="s-num" style="background:rgba(239,68,68,0.2);color:#fca5a5;">2</span>Firebase Security Rules를 설정했는가?</div>
+    <div class="summary-item"><span class="s-num" style="background:rgba(245,158,11,0.2);color:#fcd34d;">3</span>민감 API 키가 소스코드에 노출되어 있지 않은가?</div>
+    <div class="summary-item"><span class="s-num" style="background:rgba(245,158,11,0.2);color:#fcd34d;">4</span>사용자 입력값을 이스케이프하고 있는가?</div>
+    <div class="summary-item"><span class="s-num" style="background:rgba(59,130,246,0.2);color:#93c5fd;">5</span>Firebase 컬렉션 이름에 접두사를 붙였는가?</div>
+    <div class="summary-item"><span class="s-num" style="background:rgba(59,130,246,0.2);color:#93c5fd;">6</span>주요 함수에 인증 상태 체크를 추가했는가?</div>
+    
+  </div>
+
+  <div class="footer">
+    (주)넷폼알앤디 경영관리팀 | 사내 개발 보안 가이드라인 v1.0
+  </div>
+</div>
+<script>
+function toggleCode(btn){
+  var content=btn.parentElement.querySelector('.code-content');
+  btn.classList.toggle('open');
+  content.classList.toggle('open');
+  btn.querySelector('.arrow').textContent=content.classList.contains('open')?'\u25B2':'\u25BC';
+  var span=btn.childNodes;
+  for(var i=0;i<span.length;i++){if(span[i].nodeType===3){span[i].textContent=content.classList.contains('open')?' \uCF54\uB4DC \uC608\uC2DC \uC811\uAE30':' \uCF54\uB4DC \uC608\uC2DC \uBCF4\uAE30';}}
+}
+function copyPrompt(el){
+  var text=el.textContent.replace('click to copy','').replace('copied!','').trim();
+  navigator.clipboard.writeText(text).then(function(){
+    el.classList.add('copied');
+    setTimeout(function(){el.classList.remove('copied');},1500);
+  });
+}
+</script>
+</body>
+</html>

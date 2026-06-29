@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>직급체계 변경 안내</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: #fff;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #333;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 14px;
+      padding: 44px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 32px 20px;
+      background: #1e3a5f;
+      border-radius: 10px;
+    }
+    .header h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 섹션 */
+    .section {
+      margin-bottom: 34px;
+      background: #f7f9fb;
+      border-radius: 10px;
+      padding: 24px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      background: #e4ecf3;
+      border-left: 3px solid #1e3a5f;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* 목적 리스트 */
+    .purpose-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .purpose-item {
+      padding: 12px 16px;
+      background: #f0f4f8;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    /* 직급 비교 */
+    .compare {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .compare-col {
+      flex: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid #b0bcc8;
+      background: #fff;
+    }
+    .compare-col .label {
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      background: #f0f4f8;
+      color: #555;
+    }
+    .compare-col.after .label {
+      background: #1e3a5f;
+      color: #fff;
+    }
+    .compare-col .items {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .compare-col .item {
+      text-align: center;
+      padding: 8px;
+      font-size: 14px;
+      color: #444;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+    .compare-col.after .item.new {
+      background: #fff8e6;
+      color: #1e3a5f;
+      font-weight: 600;
+      border: 1.5px solid #d4a843;
+    }
+    .compare-arrow {
+      font-size: 22px;
+      color: #1e3a5f;
+      flex-shrink: 0;
+    }
+    .new-badge {
+      display: inline-block;
+      background: #e74c3c;
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 8px;
+      margin-left: 5px;
+      font-weight: 600;
+    }
+
+    /* 테이블 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1.5px solid #b0bcc8;
+      padding: 16px 14px;
+      text-align: left;
+      vertical-align: top;
+      background: #fff;
+    }
+    th {
+      background: #e4ecf3;
+      font-weight: 600;
+      color: #1e3a5f;
+    }
+
+    /* 바우처 카드 */
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .voucher-card {
+      text-align: center;
+      padding: 20px 14px;
+      border-radius: 10px;
+      border: 1.5px solid #b0bcc8;
+      background: #f8fafc;
+    }
+    .voucher-card .v-grade {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+    .voucher-card .v-amount {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3a5f;
+    }
+    .voucher-card .v-unit {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+
+    /* 정보 박스 */
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .info-box {
+      background: #f0f4f8;
+      border: 1.5px solid #b0bcc8;
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .info-box .info-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3a5f;
+      margin-bottom: 10px;
+    }
+    .info-box ul {
+      list-style: none;
+      padding: 0;
+    }
+    .info-box li {
+      font-size: 13.5px;
+      color: #555;
+      padding: 4px 0;
+      padding-left: 14px;
+      position: relative;
+    }
+    .info-box li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #1e3a5f;
+      position: absolute;
+      left: 0;
+      top: 11px;
+    }
+
+    /* 적용일 */
+    .apply-box {
+      text-align: center;
+      padding: 22px;
+      background: #f0f4f8;
+      border-radius: 10px;
+      border: 1px solid #d0d8e0;
+    }
+    .apply-box .label {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+    .apply-box .date {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* 푸터 */
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #d0d8e0;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div style="text-align:center; padding:15px 0;">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdAAAADDCAYAAAAyaECBAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAEtISURBVHhe7d1ndFzXdTf8/73Te0fvIAiABDvYOylSEtWLLdmy3O24pDjFeZPneRw7iRMnTrGdxLFjO45r3CXLkqhKUuwF7CRA9F5nBpjeZ+59P2AAYe40AEQhyP1bC2vZc+4I4JS7T9lnH4bneR6EEEIImRFW+AAhhBBCsqMASgghhMwCBVBCCCFkFiiAEkIIIbNAAZQQQgiZBQqghBBCyCxQACWEEEJmgQIoIYQQMgsUQAkhhJBZoABKCCGEzAJDpfzIouM5xCJucLEg+FgI4HmwEjVYsRKMSAaGEQmfQQghi44CKFkUPBdBLOxCNGBDLOxELOwCHwuCjwUBAKxEDUashEishkhuglhuhkiiARiaNCGE3BkogJKFFR9tRrz9CHv7EPH1IhocFV41iWGlECsskKpLIFGXQKLMBytWCi8jhJAFRwGULBieiyIWGkXQ0YTgWCNiEbfwkvQYESSKHMhNqyHTlEMkMwqvIISQBUUBlCwIno8h6h+G33YRQWcLwEeFl0wLK1ZBrq+BMncrRFKtsJkQQhYMLSiRBcAjFrTBZ72AoLN51sETALioD0FHE/wjZ8BzYWEzIYQsGAqgZN5x0QB8I+cRcrUCfEzYPGNcLICgsxlBxy0ANIFCCFkcFEDJvOK5MLyDxxFyd8xJ8JzARQPwDZ+OZ+1SECWELDwKoGReBWyXEfZ0je/vnFM8uKgXvpHz4LnZTwkTQshsUQAl88Zvv4zA6LV4tu3cjxJ5LoaAo5ECKCFkUVAAJfOAR8jThYD9MqJhB8BzwgvmCA8u4kHEPwCeiwgbCSFkXlEAJXOL5xALOeAbOolYcHQeg2cczyEaGAF/G5m9hBAyGxRAydzhY4iGRuEdOomIfxD8HCYNZRIN2AFuYX4XIYRMoABK5giPWMSLgP1qvFDCPI88p+AiXvAL+PsIIQQUQMlc4SL+8RJ9jqbbKpQwK3xsXpKUCCEkEwqg5LZxUT9C7jYE7FfARX3C5nnHsFIAjPBhQgiZVxRAyW3huTAi3j4EbJcRCzuFzQuClajB0DFnhJAFRncdMms8F0XEP4yAoxGRwLCwecGI5EaAFQsfJoSQeUUBlMwOzyEatCFgv4KQs1nYunAYFlJ1CRhWImwhhJB5RQGUzEos4kZw7AZCrhZh0wJiIJbqIZKbwDAiYSMhhMwrCqBkxngugsDoNQTHbi5qGT2GFUFuXAGGoelbQsjCowBKZoTnIvBbzyM4dgPcnBeInwGGhUhqgDJnC03fEkIWBQVQMiMhxy0EnS2IRbyLuveSFSuhKdwf38JCCCELj+F5fvHugnMoGovBOubEra5+tPcNwTrmhNvrn2zPNemRZzagqrgANeVF0KlVCc8n2YXc7fCPnEPEN7iotWdZiQbKnE1QmtfT6JMQsmjuigDa0T+Eczda0NzVD5vDBZfXj0AohHDk3Zu8Qi6DUi6DTq1EocWEjSursK66Aia9NuG/RVKL+AbgGz6FsLcPPBcWNi8YVqyC3FALVe42sBK1sJkQQhbMkg6gLq8Pl2514Nz1ZjR392PM7QXHZa+JKpWIUWAxYl11JbatrUV1SSHEYsriTIeLeOAZeBshd+c8HIw9faxIAamuEqrcrRDLLcJmQghZUEs2gLq9frx94SqOX7qJ3mEbQuGZnwep16hQt6wU+zauRv2KKohFFEQT8eBiQfiGzyAwenVRgyfDSiDVlEGZswlSdamwmRBCFtySDKDRaAyvnb6EV05ewIBtbFqjznTkMilWVpTg0I56rFpWCrVSIbzkHsWDj4UQGL0O7/Bp8LHg4iUNMSykqmIoczZCpq0EaM8nIeQOsCSzcK+1deHw6YsYsI3eVvAEgGAojMaOHvzmyGmcvnoLvkBQeMk9ieciCLk74LNeWPTgKZbnQG5cRcGTEHJHWXIjUI8vgH/8wa/R2NGLUGTm07bpsCyLAosR7z2wA/UrlkGvmbsEFT4WBhfzg48Gk7NXGRFYkRysRBXPKF38U0V4LoKItxeeoeOI+hevxi0AiGQGKC31kBvrwIpodoAQcudYUgGU53mcvNyIb/36Nbi8c39sFsswMOo0eHzvFuytXw2dRgWWmX1A42MhxCJeRAPDiPgGEQ2Ogo++u7UGACCSQqLIgURVCJHMCJFUB1YkBxbpdBGejyHqH4J38B2Evb3C5gXFipVQmNZAYVoLkcwgbCaEkEW1pAJoOBLFF7/9UzR19iESnb99iBKxGO9/cDf2bVwNk04Dlp1pMOPjZ2R2ITh2fXzf5DS2fojlFihMayDVVkAk1YNZ6BNGeA7R0Cj8tosI2K8IWxcUw0qgMNZBYamnjFtCyB1pppFh0XAch5ExJ1p7BuY1eAJAJBrFD18+gl+9fQrWMdfM1ll5DlzEA+/AMXj730LY0z2t4AkA0aANnoG34R08ioivHzwfE14yj3jEIh4EHU2LHjzBMJBpKqAwr6fgSQi5Yy2ZABqNcbjV1QeOW7gB8ysnGvCdF9/AoG1M2JRWNDQKZ9eLCDoawcUCwuZpCbnax6dQXe3CpnnDRf0IOhrhtzYImxacSGqEMm8bxIpcYRMhhNwxlkwA5XgONocL3ALPOF9qasN3XngdN9t7EI1lGhGOb/vwDBxFNGC97dFjJDAMz+BR+EbOgefmLlkqJT6KkLMFAdulaY+W5wsrUUNbfD/EChp5EkLubEsngHI8bA43FnrJNhKN4XpbN77/u7dwsakN0WjqwMhzEXgGj41Pvc7FEV88h1jYhcDoFfhtDfMaRAOOJvhtlxCLeoVNC4phZdAU7INEmU9HlBFC7nhLKoDaHa4FD6CIJy919A3jN0fO4NjFGwlF6gGA56OI+IcRctwCHwvP3Z7JiSBqvwzv4FFwYbfwitsWcrUjOHYT0dAYsAiv7QSGEUFdsAdSbQUYEZ2wQgi58y2ZAMqyDEw6DZjb2FZyOyLRKNp6B/HbY2dx5MI1uKYEUT4WRtDRFF/znOMgxHOIhT0IOprhHT41HujmSMQ/hKDjJiK+QeA2p5xvByOSQZGzEXJDDVix4o7YC0sIIdksmQDKMAz0WvWiBVDER6I9wza8ee4KXj9zCUN2RzzAuRFytQkvn0PxbTGuFviGTiDiG7jtQB0NWhGwX5lRlvB8YFgppOpSKE3rwIqVFDwJIUvGkgmgIpZFca75tgobzAWO49A3YsebZ6/gtdMX0Ts0hGjQCi7iEV46x3hw0QBCrlb4Rs4i7O2ddaISF/UjMHYTIXc7OGFhhwXEsBJIlPlQWjbGCyUs7ntLCCEzsWQCqFjEora8GDKpBIscQ8FxHIbsYzjWcB2vnGxAS68VYrlZeNm84Llo/GDr8wg5W2d+QgofQ3DsBkLOFnDRua/mNF0MI4ZYkQOFeR2kGjpdhRCy9CyZAMqyLPLNBhTlmiG6Q44dG3V5cOzSLRxuGECPJwcimXFhRlE8Nx5ErecQcnfGR5HTmNLlYwi52uC3X0Ys5FzEpCEGIpkBcuMqyPXLhY2EELIkLJkAivg66Pa1tVAr5Is+Cp3gC4TQ0NyPly650e3OAScxL9iJIRH/EPzW8wg5m8GFPZmDKM8h7O2Hd/g0YmF35mvnmUiqhdxQC7lhBUDbVQghS9SSC6B76lehojAPUolE2LxoQuEILjd344fHrejyFCIqMi5YYIj4B+EdPo2g8xZiYQ/Apyg7yHOIBkfhGz6JaNC+qBm3rFgBmb4aCtPa8aL5hBCyRC2pAAoABo0ah3bUo8BihEh05/z5MY5DR/8wvv92B7p9pQgzRvALFES5iAc+6wUExq4jFnYlBtH4XlLfyGmEvX2LGjwZVgqZrgoK42qwkrk7Lo4QQhbDnROBZmDbmlrs37QGuUY9WPYOmcuNG7SO4lsvX8c1exFCbB7ALMxImYt44B85A5/1AmJhZzyIjm9/CThuIOhoWtRpWzAsZNpyKExrIVbkCFsJIWTJWZIBFACe3LcND+3ciFyjXti06MbcXnz/tcu4as1HRFK0YNO5PBdFYPQavMOnEQ05wMfCCHu64Rs6Jbx0wUlVRVCYN0CiKhI2EULIkrSkzgMVCkeieO30Jbx68gL6raPC5kXFANCqFdizrgK7qgCzeHDBto0wjAhiZT4kylwEHc0L9nvTEUn1UOfvgky/HAxLZfoIIXeHJR1AAcAXCOJycwdeOXEBN9p7hM2LimEYKOUS7FpTgf0rZLBI+sBFFqZgO8OIAFY8t7V5Z4FhJdAUHYRcXw1GJFuYbT6EELIAlnwABQB/MIQb7d149eRFXGyaz5J6s6NVKbCq3Iy9K7WoMXsQCQwLL7krMawEqrztUBhXxZOGKHgSQu4ed0UARTyIdvQP4+iFazh28TrCkTk4UmwOqRQyrCi1YP8qI+pynHdEEBVJdRBJ9WDFCrASDViJakorDz4WRizsRizsQizsGp8KTrVNJg1lziYozeshkuoBZskutxNCSEp3TQBF/MSUrgErXj9zCUcvXEM4emcFUaVchqoiI3bV6rGhJAo+sLBTzgwrgVhugViRA7EiByKJFoxYAYYVgxXJwLCyKVfz4PkY+FgQXDQIPhZELOJBNGhH1D+EaHA0QxF6BnJDDVS52yCSm8enkwkh5C5zVwVQxINo/8gojl28jiMXrsHhXpg1x+mSSSQozTNg72oLtpZHwfu7hJfMLYYFK1ZCoiqCRFkAsdwMkUwPkVQPhp1ZdjDPRcZHpKExRIM2RP3DiPiHxveeTmBYSJT50BTeB7Eyj4InIeSuddcFUADgeB5jLg9eO30Jh09fhNvrW7yyrymIxSIUmHXYvyYfm0rDkHODABcRXnZ7GAasSAmJMg9STSkkqmKIFTlg2LnZl8rHQoiGRhHxDSDs6UXE1w8uFoRYZhzPuNVV0bQtIeSudlcGUADgeR4urx+vnLyAk1eaMGgdRYyb/vrdfGMYBlqVHI9srca28hAUXD/AzU3GLMOIIZKbINNWQqatgFhZMOPR5nTxfBTRgB0hZzOiQSukmgooLfXCywgh5K5z1wbQCTGOw+tnLuGVEw0YsI4iGlu8UnZCDAMoZDI8tXsVVuc5YZSMguUDM0rUEWJFCoiVeZAbVkCur4lvHZl/XCyIWHB0Tke5hBByJ7vrA+iEl09cwDsXb6BzYBih8BxPl86BQ9vXYveyMMzSEbDczLJdJ7BiFaTaCihMayFVFwubCSGEzKF7JoACwPW2bvzs9eO41dV3x21zAYCHtq/F1vIg8uR2iHkf+BkUfmdFcshNq6Ewr4NYZhI2E0IImWP3VABFPIj+4s2TaOzouSOD6KplpXh8oxGVOhv4iH1aI1GGFUNh3jC+51JmEDYTQgiZB/dcAAUA65gTPz18HMcv37gjg+jKylI8scmEaqMN0cCIsDmJ0lIPpaUeIplR2ETmCA9gIpVb+IWZqK/E3CmnvBNCFsQ9GUB5nseQ3YEXjpzB2xeu3nFBVMSyyDVp8fCmUmyviILzpS9PKNNWQl2wJ35EGN3A51qM4+Dy+dEyOITL7V3gOA6dI1aMeXyIxTjo1EoUGPVYV1GGrdXLYdBMreZECLmb3ZMBFPEbo9PtxdGG6/jd8fMYdXmElywqEcsi36zDwfVF2L2cB+dtFV4CkcwIbfH9kKiKp71N5c//53/h8QeEDyex6LX486cegVouFzZNOt/SjsMXr8DqdAMA9GoVHtu8AVtqqoSXLjkOrw9nW9rw8vlLuNDagUg0imBkPPksHI2B4zjw4CFiWIhELB7bXI8/feIhFJpoFuBeNuxwoqlvAP32UYTildBkYjGKTEbUlRYjR68TPoUsYfdsAEV8JDrm9uD4pZt48dhZjDrvrCAqFolg0iqwdUU+7l+thSLSDH5KwQVN4X2QG+vAipUJz0uF53nYXG4c+ut/xJgn+/FmhSYD/vPTH8OqsvTZvN95/Qj+9bevIhwdT3YqNhvxjx95DluqlwkvXTLC0SjONrfhR0dO4EZPH+xuDzyBzB0OqViMj963B19435OQiqfXkSFz43RTC/75xVcQmEVmvVImRU1hAXINOmysqsTG5ZWQiGZXOat9aASvNlzBicZbGLCPIRiJYOLWyjAMZBIJtEo5is0mfHj/bmyuXgaZZGbbvV6/dA0/OnYSY56ZVVerLsxHRV4OagoLsK6yHDl6rfASMkv3dABFPLA4PF5camrHq6cuorVnQHjJomIYBkatCttWFODQOi0U4Vvg+SikqhJoSx6cdqH2aIzD+ZY2fPjr34LT5xc2J7HotPg/730cH9izQ9gExEdoX3/pMP7z8FuTj1UXFuCVL/459KrsAf1OFI5GceTaTXz/rXdwsa0T3mBQeAkAQC6VoqaoALVFBSgwGaFXKbGuogybl3DHYSkKhMP49enz+Pz3fzqrIiliEQudUgmFVAqzVoPlRQV4bvd2rK0og1I2/XNrG1o78F+vH8Gl9k5YXW6Eo1HolEqU51ogk0rQ3D8Il88PhmGgkEqwLD8Pf/mex7CtdjmUsunv0/7893+KF85egHsaM0hT6ZRKqBVy6FVK5BsMqK8qx/3r16CuNH3nmEyP6Etf+tKXhA/eSxiGgUImQ67RAINWDafbB6tjSm3XO0AwHIHVGYAzKILZXACDkoE6fwfEytxp15qNcjEcvdaId27cmlaRfbGIRZ5Bj/1r6oRNAIAeqx3HrjeiqW+8wyGTSLCipAjP790pvHRBeQJB/PSdU/jvt47h8MWrOHzxKk7cbIbD68fKkiLh5QnONrfhR0dP4PStFvhCIWEzAKCmuBCfuH8f3rN9M/auXolNVZVYXV6KIpMREvH03gsyN0bdHpxuasWpphZhU4KqgjysrSjFsoI8sAyLMe/4CI7jeQTCYbgDAQw7XegasaJ9aBgmjQZ5Bv20RogX2zvxby+/juM3bsHu8SDGcagtLsT7dm/Hc3u2Y3fdCiwryIPN7cGI04VILIYRpwtWpxvbV1TDoJ7+mvm3Dr+FXlv6imoquQxbqqvwZ08+jF11NdCrVegcHoEvFIInEIDN5UaPzY6O4RH0WG1gWRbluRaI2OwdcJLaPR9AJ0glYlgMOhh1GkRjHPpH7MJLFlUwHMGww4cgr8L6ujVQG6tmVPEnHInix8dOoamvH9E0X8CpGDBQyKV4744twiYAQFNvP47daEK31QYA0CoV2FqzHAfWrhJeuqDO3GrFf791DG9euY7G3n409vbD7vagqiA34wjRHwrhV6fP4eULl+EJJI88GYbB6vJSfObQATy2ZQNqigph0WmhUSqglEkpeC6CPvsojl1vxI2ePmFTgg/t24Vnd27DlpoqaBRy9NlH4UoxCxOJxdBvH8OYx4fVZcXIM+iFl0zieR5Onx///JtX8Pa1mwkdrvvWrsLze3diw7IKFFtMKM/NgUTEoqGtA6F4wuKww4ntK6pRaDJOa9o4GIngP155A6MeT9q63jk6HR7bvAEfP7gXtSVFqMzLhdPnR6/Njkh8mYXneXgCQfTZRjHidEKtkKMiL4eC6CzRqzaFUi7DhtpleHLfVmyuWw6lXHZHbU0IRaLotboh09fMKHginjR1rasHkWmWMgzHYugZsSEUiSRt2wCAEacLNtd48hAAqGQyVOTlJFyz0GwuNw5fvIL2ocSzVtUKOUpyzAmPCfVY7WjuH4TDm7w+zDAMDGoVPnPoAB7ZtB4mjQbsHfS5uFc5vD4MjI0JH06gVymxYVk5ttUux5bqKhxYtxr1yyqFlyU419KGpr4B+IKpZyEQn+5/68oNHLl+E4Fw4rF+Tq8vIUAb1CrsWbUC6yvLJx8LR6O42dMH1zSmYzmex8DoGFw+Pzgu1bdxnFouR2mOBQzDQCmVYnVZCT5y327oVcmj3EA4jEvtXfjpO6fR0NYhbCbTRAFUQCIWobq0EO89uBO71tdBq1LeMUFUKZNh1bIyqBXpM2NT4SZ6nfZRcOm6rwIcx8Hp82PI4QSf4ks7OObAkMM5+f+VchnKcxcvgEZiMbx55TpO3WpJSrJQSCWwaDMnTjQPDGJg1CF8GAAgk4ixu64WD29cB4V0+mtjZH6Neb1p37MJJRYzNEpFwv+vK808lR+ORtHcPwib+90OolAwEsEPjhyH2x+YTBaacLG9E6eaWibXKtl4B6x+WUXCdUNjTgQFwTcVjuNwo7svax1vpUyKAmNiIZW15aUwalQpR5iBcBhXO7vxwpkG+EPZ/w6SLPlVJWBZFjVlRXjfA7uwbU0tjFo12BQfwIWmViqwfW2t8OGsorEYem12BMLhyS+7TCKBVCzOOJKKxmLjX1wu8YsbCIcxOOZICFQquRxVBXkJ1y2UaCyGs81t+Onx0+i1Jk+9K2SyjNNxANBjtcHqTL32rZRK8eS2TRBPY6qNLAyO4zDm8WFkSiculUKTMWErll6lRO40tpIMO5xpt3vFOA5WpxsNbR0p1yPtbg8utHWgsbd/8jGO4+EXrKvrVMppTd9yHI/G3r6ss0dqhRxluZaEx+RSKfIMhrTZ4Q6vD5c7utA5nL1gC0m2+FHhDmYx6PDswZ3YU78KuUYdRKLFe7nEIhHMeg2qiguETVmFo1G0DgwlTMWW5ZpRnmuBKsM+z2iMw+WOzqSbhDB4ikUsTBoVygVf3vnExxNA+uyjOH2rFV/9ze9wo6s3KUGKYRhoFHLkG9MH0Eg0hsFRB5y+5OlbxF/7msKCjJ2N+WR3e9A6MITGnv6UP029/egesSXNLkRiMfiCIbj8Abj8AfiCoYT3MhKLoak3+b839adz2Dq5JjzxmneP2BKe1zVihdsfSPr9mDL7MfU5t/oHMDA6huAstp5M8IXCsLvdKderp8o36hMCKMfzSZ/nVCQiUdpOczgSTVomELrR3YsTN2/BHwojEA6jsbcfR683TrZLJWKsKi2GTpk9Y53jefRkOY5RIhbBpFGn7BwYVKqMgdrp8+NCK03jzgYlEWWhUsixsqIE4WgUNocLgWAo5Y1ivuk0KmxZVYMNK9InwqTjC4bw0vmLuNLRNRlEH9m4HssLC2B1uZOmPCcwzHgP9tHNGxJ6sBMJRD3x0Z5OpRxfX0qTQBSNcfCFQnD6fBjz+GB3e2B1uWF3e2B3ezDq9sDh9cEXDMEfCiMai0HEsmAZJuX0eTSeyXi5rQu/OHkG//zCq+gYGknZQ5eKxaguLMDuVSsQikQnb4yRWAwuvx++YAgD9jG8dP4SWgeGhE+fXP/8+MF9CITD8IfGf0QsCxHLJvx9PM+P/1uDITh9fox5fHD4fBhxvvtvtbs98PgD8AWDCEaiYBhAJBKl/HdO+N35S/jum8fwwpkLeOPytaSft6/dRK/djl0rayEWieANBmFzudE+OILr3b1o6utH2+AwxjxeaJUKqORyxDgOQw4nPvfdH+PwxStJ/82Jn47hERSbTbDotJOv+ffffge/OHkOr126ijcuX0NTbz8YhoFJq4FKNp43wPM8QtEo+u1jON3Ugp+8cwq/OHkWr126iuM3b6HPPgq1XA6jRp12dJTJ4JgD79xswtXObmFTgmd2bcP6yrLJqXd/aHzt78i1m8JLE+yuq8Xm6mUp1w+jsRi6rTa8eLZB2DTJHwpBIhahwGREv30U//byG7jc0QXEZ7hWl5Xgowf2ZJ0ZQbwD/I2XX4fN5U5778nR6bC7rhY7VtYIm/DC2QvoGB6ZTCQSErEsLDpt2u8vSe+e3wc6XaFwBG+cvYzXTl9Cv9WOWCx9b3A+FOWa8fxDe7Fz3UphU1ZDDic++vVv41JH1+QU7heeeRIWnRY/eedk2t4nwzDQKhS48K9fhlGjnnz8l6fO4VuH38LNePZjicWMjx7Yg88+dHDKs8en2bzBEAbHHLjY3okLrR1oHxpGr9WOkSnTpSzDQKNQoKogH/lGPVaXl2DnimqU5eZAq1Qk9Z4HRsfwtZcO44dHTiQ8nopELMbygjzsWbUCBrUKz+zcijyDHp3DVrxw9gK8gSBGPV6cbmpBn31U+HRIxCKUWMx4YP2ahMef2r4JNUWFkIhE4AFEolG4/QH02Udxub0LV7u60TFkhScQQPvQSML6VVmOBUVmE5YV5GL3ylqsqyyDUaNOu776Nz/7DX524gzs7tSFPqRiMXatrMX3/vATiHIc3rpyA786fQ4X2zoT9gzWlRbjTx5/CI9sWo9QJILjN5vx0W98azIzNJU9q1bgC8+OF4j4zutv48fHTgkvAeJTo599+CA+ct8eaBQK+IIhXO3qxn+++hbevnpDeDkAYH1lOf7o0QdwcN3qGU+PN7R14D9eeROHL14RNk1iWQY//pPPYu/qlZOfobbBYXz3jaP4n7ffEV4+iWUY/N0Hn8HT27ek3NMcCIdxuqkV7//nf09a/5xKr1Ihz6CDPxRGr80OJv55LDAa8LVPfBD1yyogl2ZOBuTjSUl1n/180uzKVBV5ufjE/Xvx8YP7hE3Y9vm/Qttg+hGzVqnAoQ3r8O+f+rCwiWSReo6CJJFJJXh092Z84NAeLCvKX/CqsyqFHBWFs1tjnJzCnfJlt+i0WF1WDIsufXLNeMp7AIOjjoQAMDSaOIWrUSpQKshy5eOjhP/zw5/jkb/5J/zxd3+Enx0/jYbWjqTgCQZw+f242N6Bly9cwt/94kU89fdfw//90c9xo7s36Sbl8vtx5lZyacNUItEoGnv78c1X38SvTp1HnkEPnudx/OYtfPeNo/jmq2/i5yfOpAyeiE/vdgyN4Juvvpnw02d79/pgOIwTjbfwR9/5IZ748r/gL374M/z8xFk0tHWguX8Q0VgMzJTRdLfVhlNNzfjB28fxyW9+D8//y3/i16fPpx1dtA4Opw2eiAf5+qpyeIJB/On3foLPf/+nOHqtMWnDfTQWm0xaicRiaBkYTPs7J4hFLFoHhvDZb30/bfBEfBrw5fOXcfRaIxxeH35z5jw+9c3vpQ2eAHC5owsvnm1IWCucLrvbgxFn5vXPHJ0OBvW705c8z6Optx+nmpqFlyaw6LVYlp+XMngCgEIqxfrKMuiUmRMMnT4fmvsH0Wuzg2UYyKVS7FhRjZ9//g+xpboqa/AEgFAkgkvt73Z809GpFCgyJx9jyPN8yix6MjcogM7Q5lXVeO7QHqyuejclfSEoZFLkW2ZeZzUcjWJo1AmPoKpOaY4ZNcWFaW8SE3gArYNDCb3fjpERDE9J3tAq5CixvBtAeZ5HS/8gPvz1b+Ol8xfh8ifvuUO8XODvPbgff/n049Ao3s2URHwK7HfnL+Fvf/5iwtoRAARCEXTMMOlBKZMmbLPxBgMZtwRkopLLoVWOJ4AMO5z495dfx59+7yc4er0xKVFkwmObN+ChjeuSaqFGolE09fXjX158Ff/84isJbYhvzZnOWmGM4/B7//E9vHX1BnxpKiiZNBpUF42vocc4DkOjY2n3FE640tGNr790eFpBrrG3H29dvYEfHjmBr/zyJdimUV+6bXAYHUMzey8BwO0PwOlN/bmaUJGXA9WUSj9XOnvw8oXLWT87T2/bnHVLllwqwYf275zW9LNBrcLTO7bgx3/6WfzP5z6F8rwciKeZTxGLcRgcG8saBHVKJYpTBNDLnd3TyvQlszO9d5FMEotEWF1Vhg89sh8HNq8VNs8LpVyGHKNuVkkswXAEncMjCT3YshwLVHIZRCyLspwc5Okzr8NMDaADo2Nwev0JIxeNUjEZQHmeh8Pnw+9/+39wq28goSboVJX5ufjMQwfxx489hKe3b8ah+rUJSRt8fJTU0NaBX548hysd7651leda8PVPfAifeehgxhEAAKyrLMNXPvQsvvnpj+H/e/pRID41/cG9u3Dk7/4vGv7177C9drnwaZOKzCb89x99Cg3/+neTP8f/4a9QX1WBQDiMHxw5gR8cOYFhpxPRWCzlje5PHn8If/mex/HVD78fT27ZCLNWk9Ae4zgMO5z4zenzePPytYQ2m9uDYCTzDTAYjuDnJ87iUnvXeKa18II47ZT3KRqNoWVgOOsI1OHzoWPYmjGBZUKM43D44hV86/CbcPh8Kd93oYkkm5kaHHOg15accT1VeW4OlPLxAGp1unD44hWcaGzO2HEqy7HggQ1rkraDAIA3GMTlji788OgJfOVXL+Fsc1vWrSUAkGfQ45mdW7GlehmUMhlYdvwz++LZBnzxf3+FF842JOypnioSiyXNHqVi1mpSZsEPjo4hmmbtk9w+CqCzIJVIUFGUh4d2bsT9W9dDNo2pmNshEYsmbwQzFQiHk3rcecZ3y5SV51oyZqjyPI+rHT0IhscDaL99LGFEqZBJYdFqoY3vTQ2EI3jxbAPaBKPWqXRKJXasqMHT2zbDoFbBpFVj35q6lB2EUCSC863taGh/d51Wp1Jid13ttMqgLcvLxVPbNmPvqhVYXpA/+bhOpUSJxQyJeHwNMx2VTIot1ctQlmuZ/Cm1mCGXSPDWlRs4dqMRo25PypuyiGWxpaYKz+zcgtIcMyw6LTZUVaDAlHxzntga8erFqwl/T8vAeB3VTGIch8Exx3jRizQ3Wq1SgWKzafJ9mu6NubqwAF945gl85YPvS5hlSEciEmH/mjp857MfT1oTT4UHn3UULGR3e2BzuVMmjU315pVr+MjXv437/+orePaf/g0/O34arjSZ1ogHzy++/ymsLClOWJN1+nx4teEK/vi7P8If/NcP8LXfHsYvT53DjZ4+cNPoWNjdHpy4eSuhNGCvzY4fHT2Bn584izcvX0O/PXVBiEg0itaB4Yzvk1Img0GjSjkaHnI4EcnyN0rFYpi07+Y4kOmjADpLUokYZQW5eGzPZrz3wI55DaIMw6QMLtMRDIfRLgigZTnmyYSVQpMRZl3iiEjoVv8AwtHxaURhGTSdUolCk2Fy9BgIhfCTo6cyTjuuLC3CI5vWTyYmScVi1JUWpf03jjhd6Bq2TZ6KImJZyCUSjGZYF0T8byswGWFQq6CSy1KW2+sescGbZiuEiGWhVihgTBOoL7Z1omNwJO0oTiIW4SP37UaByTi5kb0sxwKTJvXrHQiHcba5bfLgbsTXm9PV5Z0gFYuxq64W3/rMx/DXz70HlXm5SRvnDWoVCs1GsCwLjufhDYZg93gy3pgLTUYcql+H9+zYgr2rV2DT8swVfABga81yfPL+/TiwbjUOrl+Nyvxc4SUJjGoV9OrMywhC41WwMr/3AGBzeXCzpw+XO7pwo7sP1jRZrGIRi111tfjSc09j18paqKd0VruGrfjuG0fxD79+CW9fvYnWgSEMjI5hzONFIBTG/rV1MGs0abe8IL7X8ui1mzjXPH6urz8Uwjd+9xpu9PQhxnFYXV6CojTLMxNr1ZneJ4NalXYW6WZ3H0IZvouIr+mW5izcFrS7Sfp3nWQllYhRnGfBvo1r8J77ts96mnU+BcKRpDWmitzcydMmSiymlHvHprK53Bh1exGNxdAvCKAGtWryDMxQJIrWwWG0DA6lvFEhPmJdWVKEdRVlk4+xLIucDMlM0VgMDq8vocxeJBZD57A1IdgIaVUKmKZkD6fSMjCUlGwzQS6VoNBoSJkhOjA6hs4RKzzB1M8Vi1iUmM3YuaImYWQgl0qSsoonxDguaS+qzeXJ2BmRisf3E37+yYfx0MZ1eO+OLfjkA/uTRosGtXryfQpHouizj2adfqzMz8WulTWw6LRQyWUJmdip6JRKrCorxsrSYqjkMhhUqqz7HA1qdcqtIpmMebwZR5IzoVcp8bnHDuHPn3oEe1ethEYhn1wWcHh9eLnhMn524gya+wcTTueRSST44L6d+Nyjh/DU9vGZlHTGt73Y8dPjp+ENBvGdN47ijSvX4QkE8MSWjdi3ug4mdfJrG41xGHV7YXO5M86SGDWqlFPOAHCrbxCh+Dm26agVcqwoLhQ+TKaBAuhtErEsLAYtDm5dj2fv3408syGp979YOI6DJxBAvyDDtCIvB4p4ADVqxm+swiSeqSKxGHqsdgQjEXQMWydPs0B87WWihF8gFMKVzm5E0kzdAoBRrYZOpcSox4uuERu6RmzoHB5BU+8AMuULRmKxhO0WqYpDCOlVqqxnH7YNDcOd5rxPlUyG8jTJJM39g7C6XCmnbhG/wW6uXgaDWn1bnarOEWvaijiId0g2VS/DxqrKyWO5Htm8AcsL8xMC93hHZ/wmG45Gkz4TqRSbjaiN31ijHJe2ozGhJMeMZfl5kEnGf29sGs8xaTVZOzlCQw4nrGnWDCfIJBKsqxjPlM1ELpVgS3UVNlVVQimTJqypX+oY3y86NeMaE+U+CwvwyQfuQ31VBZ7ftxOVeTlpO0YA4AsFcexGI77+0mv48dGTsLs82FO3Ak9t34Ty3JyUI9hQJIIeqy3rVHWOTpeUBc/xPIYdTgw5HBkPj5CIRcg16FBd9O7yBpm+5HeNzBjLsjDrtdi3cTUe37MFlcX5kMZvIospEIlgyOFMKopdZDZCLhkPoGKRCPkGQ9ZA0zk8gqExJ4bGnAl1M40aNcri0z+BSCRrtmYwHMa5lnZ843evTf782+9ex7dfeztjoopSJoUmvn7H8eNl0abW4k0lV69NmZk4VfeILW3WqlwqRVF81CbUOWzNmAUql0iwtXb5ZMLIbISjUVhdLgQzjCDkEknSMW0WrQYrSgpRmZ+LIrNpfM9pft7k+xSJRROyqFORSSQwaTSTI6tINPtz8g36hPX0UDSadatJrk6bcStVKoOjYxjOcuRgvkGP5/ftRHle6uA0IRKNoXvEKnwYkVgM51ra0Nw/KGyCQirFxuUVqC7Mh4hlUV2Yj4PrVidlWE/FcTxsTjd+cOQ4+mx2bK9djo8f3Iu6kuLJDodQMBLJWvEI8U5pviFxBBqLcbja2QN/6N3ynakY1WqsKSud8SwAGZf+k0VmTCoR4+DW9Xh8zxZUlxVBPoNDeeeDxx9Au2ADdY5OC71alZBGn2/UJ30BhZoHBtE2MJSwTUMqFsOkUU8mIIQjUfTEjzdLx6BWQyWTJVTmGfV4wfE8DqxdjfvXr0n5U7+sYnIKMRKNYsTpzjo1ZdJokG9MHQARz3AdcbrSFhJQSCUoSBNAbS532i0riH8WVpeVJO0Xdvr8abNORSybMBVodbnTVo+ZIJNIUJWfnH25b9VKfPTAHnzy/n345P378MD6NZPZv6FwdHz6OwODWpUwZRsMR9CV5TlapWJyxBeKRGBzZi61J5NIYNFpocuylWqqYCQCq8uddmvUhBUlRdi7aiWq8vOgyHCuZyAcwdnmtqSZjDGPF13D1pRVuiQiEYrNiZ+LRzatx+qykrTFMBDv+Ll8fujVKnzi/n3YvqI648EQqfIXhEQsC51KmTSFHI3FcKqpJeM0PcuyKMuxYN+amRdnIeMogM4xqUSMPfWr8OiuTVi1rBSqDF+Q6YpEovAF0t+s03H7A0k96JriQsgFN5RCo2Fyei+dxp5+tA+NJNz8dSolcvS6yanC8anB1NmEiH/Z96xagf/3zBMz/nmwfu3k7/GHwmgZSB4ZTCViWehVShgy3Jwbe/vhz3BklUoux/I0xStsbg8CGU6wELMiFFtMSdtsukZG0hZFkIrF8Uzh8ed0DlsznpLBMAyUMmlSAXEA2FJThQ/v341PHzqATx86gF1175Z4C4TDSZ8LIYtOgzzD+IgqxnFw+fzoybJtxKzVTAZptz+QlP0tZFCrEgodTIfDM74WnikwAEBdaREU8b2/mQJ0KBLBpY4u+IOhhJHamNeX9rWPchxGnIlTyBV5udi7asXkOnM6DMNAJZejwGSEJEXW7FTBcATtWfbIquVyWHQaqKYkPvE8D3cggOM3b6XNhAcAk0aN+qrKhGPWyMxQAJ0n29euwBP7tmJtdXnGXuZ0+IIhDI86so5GhLzB4OSB1xPyDfqkpBiLTos8vS7jdGO/fRSXO7oSEnnMWg3yp9TyjESjGBhNH0DV8vGCCzVFBZM/1YX5qMzPHR8Fp/kpzTEn7J30h0Jo7sscAFRyGcxabcbXvlPQIZiKjQfgiWlPoT7baNq1U0wEtxSjkV7baMIa8lRSiRg1xYUT8RM9VlvGTfASkQgWrTZrco9QJBabxvS3bnJWIhQf9WUik4yXqJuYjg1GIrBneU6OTjvjqUOryzWtMzSr8vMgl0hQVZiXNDqbKsZxsLs8aB0czriEMJU/FMLZ5ja4BEeZ7VtTh7UVpZMJeqnwPI9++yheuXAZo+70WdA8z8MXCqWcXp4q16BLqqcbjo5vUWoZGEj7b1JIpahfVoGHNq5L6lCT6aMAOo/WVJVjb/1qFOelvgnPRCgSgV3Q682Ej5+CIdxsXmIxJW3nMGrUKBAc+yTkD4dx7HpjwvFRFq0mbfZfKiaNGgbBloVI/Ki1Vxuupv252dOfkIkajkYTygGmkqPTZczsBZA0op5KIZVk3d4zU/5QGO2DIxhzpw6gCqkUG6sqJqd9h+J7O9NRzuIQ8xjHwRMIZt0ClG8woDA+TekPhTHoyHzuZq5enxDIA6EwRlyZ36PSHHPWtXehzhFr2mPnpqrIy4VMIkZZjgXaKeeBphKNxXDsRiPCUzqo4wcZJFw2KRKNoX1oGG9duZ4w/V+aY8b969dgeWH2E5N+8s4p3OzpS7u+HYnFMOrxYDTNZ2VCgdGQtE7vCwXx9rWbaRPUxSIRaksK8diWemysSjyjlMwMBdB55PYFcLOjBwPW7BmP2fj8QXQOZE8omBCORlN+AVeXl6ZcpzFPIxj6w+GEjL58oyFx/xjDZCxRxvHJm+bd/gBePNOAP/rOD1L+/Nn3f4y3rlxPyOwNRaIYGst8Q7foNLBkCIA8z6NjeDjtFhGlTIZcXfqkEJZNfVJMJhfbOtJmVbIMA71Kia1TqiJ1DFnTBnikKE84HR5/ALf6BoQPJ2AYBjqlEvr4eqbL78et3szPMahVCZnc3mAQPVk+9wa1KmOnLZWhMUfCLEgqUrEYOXotxCIRqgryYNSoM75XUY7D+ZZ2RGLvfsbUchlkEknSGvYEfyiEv/vli2gbGs8LmBhJ7q6rxZqykoyzOYivob9wtgH99tGUo1BvMISukcxT5gCgUyoSynFyPI9RtwcvnL2QcN0EEcuiNMeM92zfgofqF6aS2t0s/d2O3BaO43HkwjWcv9EKd5ZKMtPhCwTR2T/9AOryB9BnS55OzdcnT+Einkg005uxSfvuOhniGaFTq/0IOf3+hOQPnucx4nTiR8fSn6qyrqIcG6sqE9axfMEgrnf3JlwnpFUqoc2w9uUOBNA+mH4EatKoUZPh7FWLTpNxqg7xf9/U//3G5etJMwITjBo1HtiwFpopASXbGuhsAmgwEsk6gpNLxkffE6+5LxhCV5bksHyjHuYp1WwC4Uja8nQTDGp1xin2VMY8voT9mEIilkX9sorJ9XKlTIZcvS5hjVAoGovh2PXGhNFkocmIAoMhbYEUjuPRbx/DB/7lm3jt0jU4fH5EYzGoFXKU5Jhh1mYfWf/q1Dlcau9O+R77gsGs07eIL79Mzf4d83jxasMVDI8lT9Ez8X/XZx86iA/s3QF5io40mRkKoPPktdMX8fqZSxgezTxSmi5fIDSjADrq9qB1MHmdMM+oT5m0kWcwTO7nnA6dSgmLVpMwmjWoVXjPji0J103l8vnHD66Ob//os4/iJ8dOZdySsHfVCtTPYppJLhEnlE6bigfQOjCcMcFCo1CgxJy+dN2OFdVJU2dThSIRXJxyisaNnj6cb23HWIrRk1gkQmVeLp7fs2PyMU8gAHfAn3YNC/HgkG6fajqh+NaYTPIM+oQ152B4PKM2k3y9PqHCkjcQyJqRXZGXk7CGPh2DWUagDMOguig/oZNYGK9Glc3Jm7cStnxtq61CXWlxwjVCQ2NOfO67P8KDX/wK3vMP38Ajf/NV/OfhN7N2HiZ8/61juNbVI3x4vNMykvn1QzyAThRCicZiaB0cwrdfOyK8DIjXdf6zJx/Ck1s30rrnHKEAOg8u3+rAG2cvY8g2lnJ6ZjbC0SiG7GPo7E8+9DkVp8+P3ikbwEUsi/WV5SnrZSKeXDSTAJqjT96/p1Mp8cTWTThUvy5lMQme59HQ1oFTt1rQY7Xjh0dO4Ocnz6Z9jd67YwsOrl+dlEWpVSqwqTrzweInGpvxH6+8gV+cPDt5bukknseVjq6M64sKmRTmDGuo961dha21y9MmwXiDQfz85BlwPI/O4RH87c9eSFt7tjIvFx85sGdyzRHx9dlwmu01E8ZHoJlL5Qm5fQE0ZpmOzTPoYJ4SDH3BYNZgmGfUTxZEcPv9GBh1pK1GhfiIWyUfP3x7utrix7qleg0nsAyDmqKChKWEIpMRhjTv01SXOsaL8U/YWrscGyrL03bEEP9MB8Nh9FjtaGhrx/XuXjg8PhjUqqwVvhDPBD9x81ZS8t10RqClFjMKjAYwDINAKIx3btzCl3/xIhwpktQOrF2Fr33ig3h0Uz2UU06oIbcn+S5HbsuQbQw/e+M4eoZsGUcPM6WQSaFWK/D2jca0G/+ncvn9CWdcilgWK0oKU07fIl56zqhRJ2X0pZOr0yUFUJZhkGfQ4Yvvewof3r8LOTpt0ib2xt5+fOl/f4Xn//Wb+N/jp1PWoVVKZXj/7u346IE9WF6Yn1TJx6TV4NFNGxIeE3L5/Dh6rRE/PnYS17oSp3v5yfq+6QOURiHPWITBpFbjUw/eh2d3bU15owyEwnjlwmV88Gv/iY9+479wvrU9KaNWIhZjy/Jl+LMnHsKBtasSOh2tg8MIZfj7VHIZCs2mlLMJmQQj4azrx3kG/WQClScQxMCoI+W67VRGtRqaeLJOKBJNOj5PyKTRJBw1Nh09NnvWwvoMw6DIbIKIffd1qczPTfqspnKyqTmh7rBepcKzu7bhya0bMwZRxJOzQpEo8vR6/N6D9+FrH/8gnt6+JetILxyN4ncXLuF8a3vC53F8DTRzp2XY6cI/v/gqDn7h7/Hw334Vf/mjn+F6V29Cx2Xj8kr844ffh79635PYvHzZjDstJDMKoHOE43gM2x3475feQnvfUMZydjMll0lRmGeG2qDGz0+dQ0NbZ9oScohn8Dm83oRpN5ZhUGIxQ5QhucGs1WBZluLfE4rNppR7R0Usi/JcCz516AC+/skP4U8eP4T9a+qQbzRAIhIhEO+t3+obmNwPyTAM1HI5aosL8b7d2/FPH3sOn334IFaWFKe8AWkVSjy4YQ3+4j2PYWVJUcrRLhc/DNwbCEIiTGzigdaBobTbgjQKOfL0+rQVYhDf5lKWY8HHD+7Dl59/Bh87sBd1pe/+vRzPY8zjxYmbt9DU1z95zJhMIsGy/Fw8vqUeX3j2CXzhfU9h75qVSZmiDo8340kfGoUCpdM4HUVofEtKlilcvW5yOtYfDGWdjiw2m2DWaibfB4fXh94sI9aKvJwZb79x+/0ZZw0QT+5aXVaakGlebDZN63d1D9sw4nBNfi5YhkFVQT4+fegA/uLpR7G1pirl+bnL8vOwf81K/PlTj+CrH3k/PnH/Puyuq8WeVbXYsCz78kO31Y5j15vQOjA+u+Ty+9E1Ysv6b50o9XelsxvXu3rRZxuFSibD+spyfPTAXvz7730YX/7AM3h860ZUFeRP6wBvMjMMn2k+hEwLz/Nw+/z4yeF3cLThOoLBUFJlk9kSsSxyzAYYLDqc6+xAj20UB9etwrc+87G007Ecx+F6Tx8ON1yZfEwiFuHAutWoKylKOwq1utw439KGG92CKc8UttRUTfZo04nEYrA63Rh2OGFzu+EPhhCKRODw+eH0+sCyLDQKOXLjxRi0SgXyDHoUm01JdUmFYhwHm8uNloEh2N0edI1YU055FpqN2FFbnXAqCM/zePvaTbgF+/gmSMVilOVasLqsRNiUki8UwrDDiQH7GGwuNxw+f8pEHYtOO1k8IFc/vn/PoFal7AC0DAyipT/9kXAKmRSVebmoiR+QPV3dIzb87/HTwocT7KqrRX1VBeQSCTyBAK519eDEzWbhZZMKTUbsrqudLOhgd3vQ0NaRcIar0LrKMmysqkw6GzWTXpsdLf1DGasQiVgWj27ekPCaRjkOVzu70Z1lRAcAO1fWJHQGEP8+2T1edA6PwObyJAW2ifrOBUY9TFrN5PfS4fWhpX8Q/Rn2Rk/IM+hRXZgPi06LUCSCbqsdN7IkygkxDAOZRAK9SjleVtGghyLL94jcHgqgc8DrD+CVkw146Z1zcPtS35RnK89sgN6sw/XBflzr7gXDMDBp1Pifz30q45pmIBSGY8qJFQzDwKhWQZohNT/GcfCHwpPHhmWiVSoTjn2arhjHwRsMwhcMgWUYyKXSlL36mbK63Cmr08glEmiUihlPdc4Wx/MIhMMppxp1SiUUMmnSlPRCCkXGtzdlolMpJ6dXOY6DPxzOWBReIZVCLZdPjvq4+OcoU6EJrVIBpVSaNMVPyFJCAfQ2efwBnLl2Cz97/TisY8mjjtuRZzLAlKNHx5gd59s6JkcjYhGLhzeux5effwY5Oi31MAkhZBFQ9+82BEJh3Orqw8vHL8x58DTpNDBZdBj0unG5qzthKi8a4/DG5et46+qNjMW6CSGEzB8KoLMUCkfQ3juIt85emVGFoOlQKxUoyDPD6vehoaMz6TgyxAuCf+/NoxnLgRFCCJk/FEBnIRqLoWfIijfOXcHpa7eEzbdFKhGjMM8ENxfGraGhjJvGG3v68atT59A9Yku5/kcIIWT+UACdIZ7nMTLqxPFLN3HqSpOw+bawDIP8HBM4qQjX+vrQlWUjNQC8cLYBr128isExx5zuOyWEEJIZBdAZ4HkeHn8Ap6404u3zVxGew6lThmGg06hQUGDG9f4+tAkOwk7HHwrh6797Db88eQ5DY46M+0MJIYTMHQqgMxAKR/DG2ct4+WQDPBnS+mdDKZdh79Y1ONfRiZb4hurp8odC+PeXX8dP3zkNq8s1p9toCCGEpEYBdAbOXG/GicuNcGQ5o282tq9fiZ+eOodrPb1Zy6al4g+H8d03juKbr76Jnik1cAkhhMwPCqDTdLW1C0cuXEPPoHVOR3gMw2B3/Sqc7mxHjz17+a5M3IEAfnLsFP76f3+NM81twuZ5FY5E0T1iw9lbrcImQgi5K1EhhWkIRSL43otv4vilG/D6527fpUQsxrqaCtiiARy50QiH15fxBIvpUsvlqC4qwKOb1uPZXdumVQf0dgyMjuG35y7id+cvIRgO47EtG/H7Dx9MWyWJEELuBhRAp+F6Wzd++PIRNHf3z9noUywWIc9sQH5xDl5suAir0z2nWbRSsRg5eh3qSotw39pVeKh+3Yzqjk5Hj9WOI9du4si1m2jqG8DQmAN8/Gi0j9y3Gx89sAcaRWKRdEIIuVtQAJ2GH796DG+evYxRV+YaotMlFolgMmhRWVGIV69dQ+ewdU5GnqnIJGKUWMyoKSrErroarCopxsrS4lmfzODxB9A+PIILre240NqBxt5+9NvHEqaeGQDFFjMe2LAGn7h/H4rNppQF0wkhZCmjAJqFLxjEV3/wG1xt6Ux7/NVMsCwDo06D0pJ8XOrvQUNbp/CSecGyLCrzclFiMaGqIA+lORaU5owfyJur10GnUiYVXOd4HiMOJ1y+AEZcLrQPDaN9cAQ9VhvahoYxNOZAKMUJKBMMahWe2r4ZH7lvNyrzcimIEkLuKhRAs+gfseOrP3wB7X2DwqZZMWjVKCrKQbfLgaM3GoXNC0IqFiPPoEeR2YhcvQ5mrRZapTzpmDOO42F3u+H2B+JHhtkw4nRmDJpCRo0ah+rX4tld27C6tAQKmVR4CSGELEkUQLO40tyB//rN6+gdzn6WYDZ6jQpFhTlwREN47cq128q4XUqkYjEe3LAWH9i7A/XLKqBWyIWXEELIkkNzalnYne60hxrPhEohR47FAD9iONPSes8ETwAIR6N47dJVfO/NYzjR2Jyxvi8hhCwVFECziMa42868lUkkyLUY4OOjONbYBKvLLbzkrheORvHG5Wv41uG3cPpWC50gQwhZ8iiAZqFOsTY4E2KRCLkWAxi5GG026z0ZPKe63NGFX586j+a+AWETIYQsKRRAsyi0mGa95YNhGFiMOhjNOvQ4xtDY2y+85J4Tjkbxzs0m/PjYKQTCYWEzIYQsGRRAs8i3GCGfZeaoQiZFaUkemq0jONuysKX17mS+YAgXWtvxu/OXhE2EELJkUADNQiGTosBiglIuEzZltaN+JVqsI7jYvjB7PZeSPvsYTjW1CB8mhJAlgwLoNGyuW45ck174cEb7t6zFmfYOnG1tX9SEGblUgm21y/Hrv/hj1BYX3jHFDPyhEDqGRtBEa6GEkCXqzrib3uFqy4uRZzJAJJrey1W/sgo3hwfRODAAbzB421m8syViWSwvyMf/e+8T2Fy9DN/45IewtWY55JLZrenOJZ7nMeb1orG3T9hECCFLwvQiwj1Op1ZiT/0qVBTmCZuSrK4qQ0TC4Gb/AMa83kULngCwvDAff/rEQ1hdXgq5VIJVpcX42w+8Bw9vWg+dSim8fMG5fH409lBiFSFkaaIAOg0sy2LN8nJsWrkcFoNO2AwAYBkGOUY9oBDjdGsbhhxORGNzd7rKTFXk5eD9u7dj18payCTjx4qJRSLUlRbj9x++H49vrodFpxU+bUFFYxw8gbk7Ho4QQhYSBdBp0qqU2LV+JXavr0sKogzDQCGXoWZ5Cc53dqFjeGRRKw0VGA14aOM6PLJpQ8qyeStLivCRA3vw/N6dKM+1CJsJIYRMAwXQGSjOs+C+LWuxf/MaFOWagXjwVCsVWLm8FNcH+tEyODgnpf9mK0evwwMb1uDpbZtRaDIImyetLCnCc3u24/27d6C2uPC2ikUQQsi9SPSlL33pS8IHSXo6tQq5Jj00KgVYloVIxMJk0sHHxPDShUvguMVb81TJZdi/pg4f3LsTa8pLhc1JdColSnLMUMvlGHV7YHN75u1c0lTUCjnWlJdi3+qVwiZCCLnj0Qh0FvJMBhzcsh4fOLQX29evREQM/Pb8ReFlC0rEsthYVYmnt23CqrISYXNaBUYDnty2CR/avxtry0uhlM18v+tsyaVS5BvTj5IJIeRORgF0lqQSMQx6NRiZCCeaWxa1LJ2IZVFdWIDn9+3E7rpaSMXjSUPTpVcpcah+LX7/4fuxpWYZFNLZVV6aKa1CjurCfOHDhBCyJFAAnSVfMITTTa345qtvYmB0TNi8oIrNJnz60H3YXVcLyQyD5wSdSomD61fjc48ewqbllVDLk5OP5pJYJEKeQY+15WXCJkIIWRIogM5CNBbD+dZ2fPu1t9E2OCxsXlBqhRwfPbAH+9bUQae8vb2dEpEIG6sq8KXnnsa+tXXzOhK1aLXYsKwCJq1a2EQIIUsCBdAZ4nkezf2DePHsBVxobRc2LygRy+LjB/fh8S0bkTNHezrFIhHqSorxlQ8+i0c2b4BkHrJzWYZBTXEBHtm0XthECCFLBgXQGWofGsH333oHvzp1Xti04B7YsBYf2LMDeWmKO9wOi1aDv3/+GXz24YOzPs4tnZqiAjy+pR7VRQXCJkIIWTIogM7AsMOJnx0/g1caLiPGLV6VIZZh4jVuH0eR2QiGYYSX3DaGYaBVKvAHDz+Av37/0zBp5maq1azV4L61q/DA+jVg5+HvJoSQhUIBdJqC4TB+ceosXjrfAJfPL2xeMGKRCDXFhfjaJz+I0hzLvJ6uMhFEn9y2GV945kksL8iH+DZ+n1mrwXN7duDD9+2GXq0SNhNCyJLC8ItZ7XyJCIbD+PGxU/jxsZNoGxxatBq3LMMg32jAl97/FB7csG6yxu1CcHh9OH2rBT86ehINrR3wBmdWw3ZdRRme3LYJB9evRpnFDPY2AjEhhNwJKIBOw8sXLuNbh9/Cta6eRS3Tl6vX4Q8eeQDv27UVGqUSCz0B6g0G0dI/hJNNzXjnehNu9vTB5c88Gl9dXoqdK6qxY0U1VpeXwKTRzOuomRBCFgoF0CzOtbTh315+HWdvtc141DWXcvQ6PLNjCz516MCcZdzO1ojThdaBIbQNDqPbasPgmAO+Ka8NAwa5eh1Kcy2oLSpATVEh8gz6BR0xE0LIfKMAmkFz/wD+9beHceTaTbj9AWHzgjGqVbh//Rr80aMPojI/V9i8aEKRCEbdXlhdLvhDUyoxMYBFo0GByQilTDovSU6EELLYKICmwPM8HF4f/uW3r+IXJ88uatKQRqHArroafOrB+7ClukrYTAghZJHQYpQAz/Nw+QP45alzePFsAzyLOPKUSyRYW1GKZ3dto+BJCCF3GAqgU/A8D28wiGPXGvFPv3kZ9gU+3msqlmVRVZiPp7dvxt5VK4TNhBBCFhkF0CmCkQgutXfhK795CZ5AAIs1u80yDIpMRjy9bTMe3rgeMsncVgIihBBy+yiAxkViMbT0D+JffvsquoatWJzQOc6oUeND+3fhvTu3QKtUCJsJIYTcASiAxqduO4ZG8O+vvIFzzW3C5gUlFrF4bHM9DtWvhVmrETYTQgi5Q1AABWD3eHH0eiNeabgibFpwj26ux3N7d6Ay787ZrkIIISQZBVAA1zq78T9vvwNuEQvEA8Duulp8/OBe1BQV0N5JQgi5w93zAbTHasepphb028eETQuqNMeMP3zkAawqLZmXMzgJIYTMLQqgNhuudvUgGosJmxaMWafB/33mCayrLJ/zszcJIYTMj3s+gPbZRtHY0y98eEEwDAONYvzMzT11K6CWy4SXEEIIuUPd0wHUEwhgcMwJp88nbFoQCqkUz+3ejie2boROqaB1T0IIWULu8QAahDvLcVzzRaOQ45FN6/Hh+3YjV6+j8zEJIWSJuafv2tEYtyiHYyukUqyvLMfvPbAflfm5YGnkSQghS849HUAXg0wiQW1xIZ7ftwurykqEzYQQQpaIezqAikUsxAu4ZUQiEqEyLwfv3bkFj23eIGwmhBCyhNzTAVSrUMCgVi7IFCrDMCgyG/Hktk14/+7twmZCCCFLzD0dQNUKOXL1OmgU81+wXa9S4sENa/HBfbugkEqFzYQQQpaYezqAAkCxxYy6smLhw3NKLBLh0c0b8KkH74NBrRI2E0IIWYLu+QBamZeL+mUVwofn1KH6tXhu9w7kGQ3CJkIIIUvUPR9A8ww6bF6+DMsL8oVNc2JbTRWe2bkVdWXFmP+VVkIIIQvlng+gIpZFXVkxnty2Sdh029YvK8cnHtiP7bXVVCCeEELuMvd8AAUAi1aD+9evxjM7twqbZi3faMD7d2/H1prlUFGNW0IIuetQAI0n+SzLz8OH79uN9+zYLGyesXyjAZ956AAOrF1FSUOEEHKXYnie54UP3quCkQiaevvxoyMn8NtzF+EPhzHTl2dtRRneu2MLHt60frzG7QLsMSWEELLwKIAKRGIxdAyO4PClKzjf0o4rnd1w+fzgMrxMEpEIJRYzNlcvw31rV2HHimroVAtToIEQQsjioACaRjAcxsX2Tlxo7URz3wBGnC5YXW74QyEgXtNWr1JCr1ahLMeCutJi7FxZgxKLCSI6WYUQQu56FECnoWNoBD02O7pHbHDFjz9TyWTI1euQZ9CjuqgAepVS+DRCCCF3MQqghBBCyCzQXCMhhBAyCxRACSGEkFmgAEoIIYTMAgVQQgghZBYogBJCCCGzQAGUEEIImQUKoIQQQsgsUAAlhBBCZoECKCGEEDILFEAJIYSQWaAASgghhMwCBVBCCCFkFiiAEkIIIbNAAZQQQgiZBQqghBBCyCxQACWEEEJmgQIoIYQQMgsUQAkhhJBZoABKCCGEzAIFUEIIIWQWKIASQgghs0ABlBBCCJkFCqCEEELILPz/j6i0QqiHGMEAAAAASUVORK5CYII=" alt="넷폼알앤디 로고" style="height:50px;">
+  </div>
+  <div class="header">
+    <h1>(주) 넷폼알앤디 직급체계 변경 안내</h1>
+    <p>2026년 직급체계 개편에 따른 변경 사항을 안내드립니다.</p>
+  </div>
+
+  <!-- 1. 변경 목적 -->
+  <div class="section">
+    <div class="section-title">1. 변경 목적</div>
+    <div class="purpose-list">
+      <div class="purpose-item">조직 역할과 책임 범위 명확화</div>
+      <div class="purpose-item">리더십 단계 기반 직급 체계 정비</div>
+      <div class="purpose-item">조직 성장에 따른 운영 기준 마련</div>
+    </div>
+  </div>
+
+  <!-- 2. 직급체계 변경 내용 -->
+  <div class="section">
+    <div class="section-title">2. 직급체계 변경 내용</div>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="label">현행</div>
+        <div class="items">
+          <div class="item">매니저</div>
+          <div class="item">리드매니저</div>
+          <div class="item" style="visibility:hidden;">—</div>
+          <div class="item">임원</div>
+        </div>
+      </div>
+      <div class="compare-arrow">&rarr;</div>
+      <div class="compare-col after">
+        <div class="label">변경</div>
+        <div class="items">
+          <div class="item">매니저</div>
+          <div class="item">리드매니저</div>
+          <div class="item new">수석매니저 <span class="new-badge">신설</span></div>
+          <div class="item">임원</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 직급별 역할 정의 -->
+  <div class="section">
+    <div class="section-title">3. 직급별 역할 정의</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:11%; white-space:nowrap;">직급</th>
+          <th>역할 정의</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:12px; font-weight:700; white-space:nowrap;">매니저</td>
+          <td>부서 구성원으로서 담당 업무 및 프로젝트 실무를 수행하는 직급</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px; font-weight:700; white-space:nowrap;">리드매니저</td>
+          <td>소속 부서를 통솔하며, 팀 운영 및 성과 관리를 책임지는 직급</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px; font-weight:700; white-space:nowrap;">수석매니저</td>
+          <td>여러 부서 간 협업을 조율하고, 전사 전략 과제나 관계사 협업 등 회사 전반에 영향을 미치는 핵심 업무를 주도하는 직급</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px; font-weight:700; white-space:nowrap;">임원</td>
+          <td>회사 경영 및 조직 전략 의사결정을 총괄하는 직급</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. 바우처 제도 운영 -->
+  <div class="section">
+    <div class="section-title">4. 바우처 제도 운영</div>
+    <p style="font-size:14px; color:#555; margin-bottom:14px;">리드매니저 이상 직급에 대해 바우처를 지급합니다.</p>
+
+    <div class="voucher-grid">
+      <div class="voucher-card">
+        <div class="v-grade">리드매니저</div>
+        <div class="v-amount">200</div>
+        <div class="v-unit">만원 / 연</div>
+      </div>
+      <div class="voucher-card">
+        <div class="v-grade">수석매니저</div>
+        <div class="v-amount">250</div>
+        <div class="v-unit">만원 / 연</div>
+      </div>
+      <div class="voucher-card">
+        <div class="v-grade">임원</div>
+        <div class="v-amount">300</div>
+        <div class="v-unit">만원 / 연</div>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:12px;">
+        <div class="info-title">바우처 사용처</div>
+        <ul style="display:grid; grid-template-columns:1fr 1fr; gap:2px 24px;">
+          <li>필요 물품 구매</li>
+          <li>자기계발</li>
+          <li>여행 및 휴식</li>
+          <li>문화·여가 활동</li>
+          <li>건강검진</li>
+          <li>기타 복지 목적 지출</li>
+          <div></div>
+          <li style="font-weight:700;">팀 운영비 (부여된 예산 중 최소 50만원은 팀 운영비로 사용)</li>
+        </ul>
+        <p style="font-size:12.5px; color:#888; margin-top:10px;">※ 상기 항목 외 사용처에 대해서는 경영관리팀에 사전 문의 바랍니다.</p>
+      </div>
+      <div class="info-box">
+        <div class="info-title">사용 방법</div>
+        <ul>
+          <li>법인카드 소지자 : 개인 소지 법인카드로 결제</li>
+          <li>법인카드 미소지자 : 경영관리팀 법인카드로 결제</li>
+        </ul>
+      </div>
+  </div>
+
+  <!-- 5. 변경 조직도 -->
+  <div class="section">
+    <div class="section-title">5. 변경 조직도</div>
+    <style>
+      #orgEmbed{overflow:hidden;background:#fff;border:1.5px solid #b0bcc8;border-radius:10px;padding:10px;max-height:400px;cursor:pointer;position:relative;}
+      #orgPreviewBtn{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,#fff 70%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;pointer-events:none;z-index:5;}
+      #orgPreviewBtn span{pointer-events:auto;background:#1e3a5f;color:#fff;padding:8px 24px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;}
+      #orgEmbed .org-print-area{display:flex;flex-direction:column;align-items:center;min-width:max-content;padding:20px 30px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;transform:scale(0.42);transform-origin:top left;}
+      #orgEmbed .vl{width:2px;height:18px;background:#b4b4b4;margin:0 auto;}
+      #orgEmbed .hl{height:2px;background:#b4b4b4;}
+      #orgEmbed .o-ceo{background:#1a1a1a;border-radius:10px;padding:12px 32px;text-align:center;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+      #orgEmbed .o-ceo .o-badge{color:#f59e0b;font-size:13px;}
+      #orgEmbed .o-ceo .o-nm{font-size:15px;font-weight:700;color:#fff;margin:0 4px;}
+      #orgEmbed .o-ceo .o-pos{font-size:11px;color:#999;font-weight:500;}
+      #orgEmbed .o-grp{background:#1a1a1a;border-radius:22px;padding:6px 22px;color:#fff;font-size:13px;font-weight:600;display:inline-block;}
+      #orgEmbed .o-head{background:rgba(45,138,86,.08);border:1.5px solid #2d8a56;border-radius:8px;padding:6px 14px;text-align:center;display:inline-block;white-space:nowrap;}
+      #orgEmbed .o-head .o-badge{color:#2d8a56;font-size:12px;vertical-align:middle;}
+      #orgEmbed .o-head.is-sm .o-badge{color:#7c3aed;}
+      #orgEmbed .o-head .o-nm{font-size:12px;font-weight:700;color:#2d8a56;margin:0 3px;}
+      #orgEmbed .o-head .o-pos{font-size:9px;color:#2d8a56;font-weight:500;opacity:.7;}
+      #orgEmbed .o-div{background:#1a1a1a;border-radius:8px;padding:6px 16px;text-align:center;display:inline-block;}
+      #orgEmbed .o-div .o-nm{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;}
+      #orgEmbed .o-subdiv{background:#1a1a1a;border-radius:8px;padding:6px 16px;text-align:center;display:inline-block;min-width:110px;}
+      #orgEmbed .o-subdiv .o-nm{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;}
+      #orgEmbed .o-tm{background:#fff;border:1.5px solid #dddfe3;border-radius:5px;padding:5px 4px;text-align:center;width:110px;box-sizing:border-box;}
+      #orgEmbed .o-tm .o-nm{font-size:10px;font-weight:700;color:#1a202c;white-space:nowrap;}
+      #orgEmbed .o-mem{background:#fff;border:1px solid #dddfe3;border-radius:5px;padding:3px 4px;text-align:center;width:110px;box-sizing:border-box;}
+      #orgEmbed .o-mem .o-nm{font-size:9px;font-weight:600;color:#1a202c;}
+      #orgEmbed .o-mem .o-pos{font-size:7.5px;color:#718096;font-weight:400;}
+      #orgEmbed .o-mem.is-ld{border-left:3px solid #e67e22;background:rgba(230,126,34,0.06);}
+      #orgEmbed .o-mem.is-ld .o-badge{color:#e67e22;font-size:9px;}
+      #orgEmbed .o-mem.is-ld .o-nm{color:#e67e22;font-weight:700;}
+      #orgEmbed .o-mem.is-sm{border-left:3px solid #7c3aed;background:rgba(124,58,237,.06);}
+      #orgEmbed .o-mem.is-sm .o-badge{color:#7c3aed;font-size:8px;}
+      #orgEmbed .o-mem.is-sm .o-nm{color:#7c3aed;font-weight:700;}
+      #orgEmbed .o-head.is-sm{background:rgba(124,58,237,.08);border-color:#7c3aed;}
+      #orgEmbed .o-head.is-sm .o-nm{color:#7c3aed;}
+      #orgEmbed .o-head.is-sm .o-pos{color:#7c3aed;}
+      #orgEmbed .o-mems{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:3px;}
+      #orgEmbed .o-row{display:flex;justify-content:center;gap:0;align-items:flex-start;}
+      #orgEmbed .o-col{display:flex;flex-direction:column;align-items:center;padding:0 4px;}
+    </style>
+    <div id="orgEmbed" onclick="openOrgPopup()">
+      <div id="orgPreviewBtn"><span>클릭하여 조직도 크게 보기</span></div>
+      <div class="org-print-area"><div style="align-self:stretch;display:flex;justify-content:space-between;align-items:center;padding:0 0 28px;"><div style="display:inline-flex;gap:8px;align-items:center;"><div style="display:flex;align-items:center;justify-content:center;width:110px;padding:6px 0;border-radius:8px;font-size:12px;font-weight:600;background:rgba(21,128,61,0.06);border:1.5px solid #15803d;color:#15803d;">★ 임원</div><div style="display:flex;align-items:center;justify-content:center;width:110px;padding:6px 0;border-radius:8px;font-size:12px;font-weight:600;background:rgba(124,58,237,0.06);border:1.5px solid #7c3aed;color:#7c3aed;">◆ 수석 매니저</div><div style="display:flex;align-items:center;justify-content:center;width:110px;padding:6px 0;border-radius:8px;font-size:12px;font-weight:600;background:rgba(230,126,34,0.06);border:1.5px solid #e67e22;color:#e67e22;">● 리드 매니저</div></div><div style="font-size:11px;color:var(--text-dim);font-weight:500;">v2026.03.12</div></div><div class="o-ceo"><span class="o-nm">이승우</span> <span class="o-pos">대표이사</span></div><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col" style="padding:0 10px"><div class="vl"></div><div class="o-grp">용인사업장</div><div class="vl"></div><div class="o-head">
+            <span class="o-badge">★</span> <span class="o-nm">정영재</span> <span class="o-pos">부사장</span>
+        </div><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col" style="padding:0 4px"><div class="vl"></div><div class="o-subdiv"><div class="o-nm">용인공장</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">김성준</span> <span class="o-pos">공장장</span>
+        </div></div><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #6B7280"><div class="o-nm">관리팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem">
+            <span class="o-nm">이나라</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #92400E"><div class="o-nm">생산/품질관리팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">이재민</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김유진</span> <span class="o-pos">매니저</span>
+        </div></div></div></div></div><div class="o-col" style="padding:0 4px"><div class="vl"></div><div class="o-subdiv"><div class="o-nm">소재 기술연구소</div></div><div class="vl"></div><div class="o-head">
+            <span class="o-badge">★</span> <span class="o-nm">정영재</span> <span class="o-pos">연구소장(겸임)</span>
+        </div><div class="vl"></div><div class="o-mems"><div class="o-mem is-sm">
+            <span class="o-badge">◆</span> <span class="o-nm">신명희</span> <span class="o-pos">수석 매니저</span>
+        </div></div></div><div class="o-col" style="padding:0 4px"><div class="vl"></div><div class="o-subdiv"><div class="o-nm">건설 기술연구소</div></div><div class="vl"></div><div class="o-head">
+            <span class="o-badge">★</span> <span class="o-nm">이정훈</span> <span class="o-pos">기술연구소장</span>
+        </div><div class="vl"></div><div class="o-mems"><div class="o-mem">
+            <span class="o-nm">심혜진</span> <span class="o-pos">연구원</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김소정</span> <span class="o-pos">연구원</span>
+        </div></div></div></div></div><div class="o-col" style="padding:0 10px"><div class="vl"></div><div class="o-grp">본사</div><div class="vl"></div><div style=""><div class="hl" id="hlBonsa"></div></div><div id="rowBonsa" style="display:grid;grid-template-columns:repeat(4,auto);grid-template-rows:auto auto auto;justify-content:center;gap:0 8px;"><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-div"><div class="o-nm">영업본부</div></div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-div"><div class="o-nm">경영관리본부</div></div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-div"><div class="o-nm">커머스사업본부</div></div></div><div style="grid-row:1/3;grid-column:4;display:flex;flex-direction:column;align-items:center;"><div style="width:2px;background:#b4b4b4;flex:1;min-height:54px;"></div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-head">
+            <span class="o-badge">★</span> <span class="o-nm">황윤선</span> <span class="o-pos">상무이사</span>
+        </div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-head">
+            <span class="o-badge">★</span> <span class="o-nm">백정석</span> <span class="o-pos">이사</span>
+        </div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div class="o-head is-sm">
+            <span class="o-badge">◆</span> <span class="o-nm">허지은</span> <span class="o-pos">수석 매니저</span>
+        </div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #3182CE"><div class="o-nm">서비스운영1팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">한준엽</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">조재연</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">정정훈</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김성민</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김경미</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #805AD5"><div class="o-nm">서비스운영2팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">권정아</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김수진</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">이지연</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #0891B2"><div class="o-nm">서비스운영3팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">주현진</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">송보람</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #16A34A"><div class="o-nm">영업팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem">
+            <span class="o-nm">이필선</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #D97706"><div class="o-nm">설계/적산팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">한인규</span> <span class="o-pos">리드 매니저</span>
+        </div></div></div></div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #DB2777"><div class="o-nm">그로스팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-sm">
+            <span class="o-badge">◆</span> <span class="o-nm">이재훈</span> <span class="o-pos">수석 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김범석</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #4F6DB5"><div class="o-nm">경영관리팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-sm">
+            <span class="o-badge">◆</span> <span class="o-nm">신나영</span> <span class="o-pos">수석 매니저</span>
+        </div><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">주유진</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">최영옥</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김유림</span> <span class="o-pos">매니저</span>
+        </div></div></div></div></div><div style="display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div style=""><div class="hl"></div></div><div class="o-row"><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #EA580C"><div class="o-nm">해외사업팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem">
+            <span class="o-nm">김채원</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">쩐티리</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #DC2626"><div class="o-nm">모여라딜팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">김송희</span> <span class="o-pos">리드 매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #0D9488"><div class="o-nm">미디어커머스팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">김소연</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">이채은</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">남윤정</span> <span class="o-pos">매니저</span>
+        </div></div></div><div class="o-col"><div class="vl"></div><div class="o-tm" style="border-left:4px solid #6D28D9"><div class="o-nm">브랜드커머스팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem">
+            <span class="o-nm">이란</span> <span class="o-pos">매니저</span>
+        </div></div></div></div></div><div style="grid-column:4;display:flex;flex-direction:column;align-items:center;"><div class="vl"></div><div style="height:2px;"></div><div class="vl"></div><div class="o-tm" style="border-left:4px solid #CA8A04"><div class="o-nm">브랜드마케팅팀</div></div><div class="vl"></div><div class="o-mems"><div class="o-mem is-ld">
+            <span class="o-badge">●</span> <span class="o-nm">권혜영</span> <span class="o-pos">리드 매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">함지민</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">김소라</span> <span class="o-pos">매니저</span>
+        </div><div class="o-mem">
+            <span class="o-nm">최경선</span> <span class="o-pos">매니저</span>
+        </div></div></div></div></div></div></div>
+    </div>
+    <script>
+    (function(){
+      function autoHL(hl,cols){if(!cols||cols.length<2){hl.style.width='0';return;}var r=cols.map(function(c){return c.getBoundingClientRect();});var x1=r[0].left+r[0].width/2,x2=r[r.length-1].left+r[r.length-1].width/2;var w=Math.max(0,x2-x1);var pr=hl.parentElement.getBoundingClientRect();hl.style.position='absolute';hl.style.left=(x1-pr.left)+'px';hl.style.width=w+'px';hl.style.top='0';}function layoutHL(){document.querySelectorAll('#orgEmbed .hl').forEach(function(hl){var p=hl.parentElement;p.style.position='relative';p.style.height='2px';p.style.alignSelf='stretch';});document.querySelector('#orgEmbed .org-print-area').offsetHeight;document.querySelectorAll('#orgEmbed .o-row').forEach(function(row){var prev=row.previousElementSibling;if(!prev)return;var hl=prev.querySelector?prev.querySelector('.hl'):null;if(!hl)return;var cols=Array.from(row.children).filter(function(c){return c.classList.contains('o-col');});autoHL(hl,cols);});var hlB=document.getElementById('hlBonsa');var rowB=document.getElementById('rowBonsa');if(hlB&&rowB){var kids=Array.from(rowB.children);var first=kids[0],last=null;for(var i=kids.length-1;i>=0;i--){if(kids[i].offsetHeight>0){last=kids[i];break;}}if(first&&last)autoHL(hlB,[first,last]);}}requestAnimationFrame(function(){layoutHL();setTimeout(layoutHL,100);});
+    })();
+    function openOrgPopup(){
+      var styleEl=document.querySelector('#orgEmbed').parentElement.querySelector('style');
+      var orgNode=document.getElementById('orgEmbed').querySelector('.org-print-area').cloneNode(true);
+      orgNode.querySelectorAll('[id]').forEach(function(el){el.id='pop_'+el.id;});
+      var css=styleEl.textContent.replace(/#orgEmbed/g,'body');
+      var layoutJS='function autoHL(hl,cols){if(!cols||cols.length<2){hl.style.width="0";return;}var r=cols.map(function(c){return c.getBoundingClientRect();});var x1=r[0].left+r[0].width/2,x2=r[r.length-1].left+r[r.length-1].width/2;var w=Math.max(0,x2-x1);var pr=hl.parentElement.getBoundingClientRect();hl.style.position="absolute";hl.style.left=(x1-pr.left)+"px";hl.style.width=w+"px";hl.style.top="0";}function layoutHL(){document.querySelectorAll(".org-print-area .hl").forEach(function(hl){var p=hl.parentElement;p.style.position="relative";p.style.height="2px";p.style.alignSelf="stretch";});document.querySelector(".org-print-area").offsetHeight;document.querySelectorAll(".org-print-area .o-row").forEach(function(row){var prev=row.previousElementSibling;if(!prev)return;var hl=prev.querySelector?prev.querySelector(".hl"):null;if(!hl)return;var cols=Array.from(row.children).filter(function(c){return c.classList.contains("o-col");});autoHL(hl,cols);});var hlB=document.getElementById("pop_hlBonsa");var rowB=document.getElementById("pop_rowBonsa");if(hlB&&rowB){var kids=Array.from(rowB.children);var first=kids[0],last=null;for(var i=kids.length-1;i>=0;i--){if(kids[i].offsetHeight>0){last=kids[i];break;}}if(first&&last)autoHL(hlB,[first,last]);}}requestAnimationFrame(function(){layoutHL();setTimeout(layoutHL,150);});';
+      var blob=new Blob(['<!DOCTYPE html><html><head><meta charset="UTF-8"><title>변경 조직도</title><style>*{margin:0;padding:0;box-sizing:border-box;}#orgPreviewBtn{display:none;}'+css+'body{background:#fff!important;padding:20px!important;overflow:auto!important;max-height:none!important;min-width:max-content!important;cursor:default!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif!important;}.org-print-area{min-width:max-content;transform:none!important;transform-origin:unset!important;}</style></head><body>'+orgNode.outerHTML+'<scr'+'ipt>'+layoutJS+'</scr'+'ipt></body></html>'],{type:'text/html'});
+      var url=URL.createObjectURL(blob);
+      window.open(url,'_blank');
+    }
+    </script>
+  </div>
+
+  <div class="section">
+    <div class="section-title">6. 시행일 : 2026.03.12</div>
+  </div>
+
+  <div style="text-align:center; font-size:16px; font-weight:600; color:#1e3a5f; margin-top:30px;">
+    (주) 넷폼알앤디
+  </div>
+
+</div>
+
+</body>
+</html>

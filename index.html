@@ -944,6 +944,7 @@
       gap: 8px;
     }
 
+    .wip-badge { display: inline-block; margin-left: 8px; font-size: 10.5px; font-weight: 800; color: var(--amber); background: #fdf2dd; border-radius: 999px; padding: 2px 8px; vertical-align: middle; letter-spacing: 0; }
     .screen-link {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -2190,7 +2191,7 @@
       { id:"songsan",   t:"송산그린시티 청약 안내", s:"신청 일정, 제출서류, 납부정보", url:"https://netformrnd.github.io/songsan/" }
     ]},
     { cat:"비용 / 자금", items:[
-      { id:"budget",    t:"예산·바우처 관리", s:"팀 회식비·직급바우처·그로스데이 포상 현황", url:"https://netformrnd.github.io/budget/" },
+      { id:"budget",    t:"예산·바우처 관리", s:"팀 회식비·직급바우처·그로스데이 포상 현황", url:"https://netformrnd.github.io/budget/", wip:true },
       { id:"corp_card", t:"팀별 법인카드 고정지출 관리", s:"정기 지출 내역 작성과 품의서 변환", url:"https://netformrnd.github.io/corp_card/" },
       { id:"pourstore", t:"포어·그로홈 입금관리", s:"입금내역 확인 및 세금계산서 발행 요청", url:"https://netformrnd.github.io/pourstore-deposit/" }
     ]},
@@ -2255,8 +2256,9 @@
     function toggleFav(id){ var i=favs.indexOf(id); if(i===-1)favs.push(id); else favs.splice(i,1); saveFavs(); saveUserFavs(); renderSide(); syncStars(); }
 
     function itemRow(it){
+      var titleB = it.wip ? h("b",null,[it.t, h("span",{class:"wip-badge",text:"오픈예정"})]) : h("b",{text:it.t});
       return h("div",{class:"screen-link","data-open":it.id},[
-        h("span",null,[ h("b",{text:it.t}), h("span",{text:it.s}) ]),
+        h("span",null,[ titleB, h("span",{text:it.s}) ]),
         h("button",{class:"fav-star",type:"button","data-fav":it.id,text:"☆"}),
         h("span",{class:"arrow",text:"›"})
       ]);
@@ -2354,7 +2356,7 @@
       var sfav=e.target.closest(".side-fav-star[data-fav]");
       if(sfav){ e.preventDefault(); e.stopPropagation(); toggleFav(sfav.getAttribute("data-fav")); return; }
       var op=e.target.closest("[data-open]");
-      if(op){ var it=MAP[op.getAttribute("data-open")]; if(it && it.url && it.url!=="#") window.open(it.url,"_blank","noopener"); }
+      if(op){ var it=MAP[op.getAttribute("data-open")]; if(!it) return; if(it.wip){ alert(it.t+"는 오픈 예정입니다.\n준비되는 대로 안내드릴게요."); return; } if(it.url && it.url!=="#") window.open(it.url,"_blank","noopener"); }
     });
   })();
   </script>
@@ -2513,7 +2515,7 @@
     });
     if(el("logoutBtn")) el("logoutBtn").addEventListener("click",function(){ localStorage.removeItem(SSO_KEY); localStorage.removeItem(SES); sessionStorage.removeItem(SSO_KEY); sessionStorage.removeItem(SES); location.reload(); });
     /* Firestore 공용계정이 늦게 도착하면, 이미 로그인한 사용자 정보를 그 시점에 다시 반영 */
-    window.__onUsersLoaded=function(){ var u=curUser(); if(u){ window.__loungeUser=u; if(window.__refreshGuide) window.__refreshGuide(); if(window.__loadUserFavs) window.__loadUserFavs(); } };
+    window.__onUsersLoaded=function(){ var u=curUser(); if(u){ window.__loungeUser=u; var __g=el("loginGate"); if(__g && !__g.hidden){ applyUser(u); } else { if(window.__refreshGuide) window.__refreshGuide(); } if(window.__loadUserFavs) window.__loadUserFavs(); } };
 
     var form=el("voiceForm");
     if(form){

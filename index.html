@@ -2590,6 +2590,7 @@
     }
     refreshEmp();
     function empName(id){var e=BY[id];return e?e.name:id;}
+    function empLabel(id){var e=BY[id];return e?(e.name+" ("+id+")"):String(id);}
     function curIds(id){var x=loadP()[id];return (x&&x.ids)||[];}
     function persist(id,mode,ids){var all=loadP();all[id]={mode:mode,ids:ids};saveP(all);if(window.__refreshGuide)window.__refreshGuide();renderPerm();}
 
@@ -2624,7 +2625,7 @@
         chipsBox.appendChild(mk("span",{class:"emp-pick-chip"},[mk("span",{text:nm}),x]));
       });
     }
-    function renderPickList(f){if(!pickList)return;clr(pickList);f=(f||"").trim();var last=null;EMP_SORTED.forEach(function(e){if(f&&(e.name+e.dept+(e.position||"")).indexOf(f)===-1)return;if(e.dept!==last){last=e.dept;pickList.appendChild(mk("div",{class:"emp-pick-dept",text:e.dept||"(부서 없음)"}));}var cb=mk("input",{type:"checkbox",value:e.id});if(pickSel[e.id])cb.checked=true;cb.addEventListener("change",function(){ if(cb.checked)pickSel[e.id]=true; else delete pickSel[e.id]; renderChips(); });pickList.appendChild(mk("label",{class:"emp-pick-item"},[cb,mk("span",{text:e.name})]));});}
+    function renderPickList(f){if(!pickList)return;clr(pickList);f=(f||"").trim();var last=null;EMP_SORTED.forEach(function(e){if(f&&(e.name+e.dept+(e.position||"")+(e.id||"")).indexOf(f)===-1)return;if(e.dept!==last){last=e.dept;pickList.appendChild(mk("div",{class:"emp-pick-dept",text:e.dept||"(부서 없음)"}));}var cb=mk("input",{type:"checkbox",value:e.id});if(pickSel[e.id])cb.checked=true;cb.addEventListener("change",function(){ if(cb.checked)pickSel[e.id]=true; else delete pickSel[e.id]; renderChips(); });pickList.appendChild(mk("label",{class:"emp-pick-item"},[cb,mk("span",{text:e.name+" ("+e.id+")"})]));});}
     function openPick(t,checked,apply){onApply=apply;refreshEmp();if(title)title.textContent="인원 선택 — "+t;if(search)search.value="";pickSel={};(checked||[]).forEach(function(id){pickSel[String(id)]=true;});renderChips();renderPickList("");if(modal)modal.hidden=false;}
     function closePick(){if(modal)modal.hidden=true;onApply=null;}
     if(search)search.addEventListener("input",function(){renderPickList(search.value);});
@@ -2663,7 +2664,7 @@
       box.appendChild(mk("p",{class:"perm-cat",text:"제한된 항목"}));
       if(!restricted.length) box.appendChild(mk("p",{class:"perm-empty",text:"제한된 항목이 없습니다. 아래 ‘전체 공개 항목’에서 지정하세요."}));
       restricted.forEach(function(it){
-        var chips=curIds(it.id).map(function(id){return mk("span",{class:"perm-chip",text:empName(id)});});
+        var chips=curIds(it.id).map(function(id){return mk("span",{class:"perm-chip",text:empLabel(id)});});
         var edit=mk("button",{class:"perm-edit",type:"button",text:"편집"});
         edit.addEventListener("click",function(){openPick(it.t,curIds(it.id),function(ids){persist(it.id, ids.length?"some":"all", ids);});});
         var reset=mk("button",{class:"perm-edit pe-reset",type:"button",text:"전체공개로"});

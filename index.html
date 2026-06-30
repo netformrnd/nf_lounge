@@ -1542,6 +1542,7 @@
         <button type="submit">변경하고 시작하기</button>
         <p id="pwErr" class="login-err" hidden></p>
         <button type="button" id="pwCancel" class="pw-cancel" hidden>취소</button>
+        <button type="button" id="pwLogout" class="pw-cancel">다른 계정으로 로그인</button>
       </form>
     </div>
   </div>
@@ -2482,6 +2483,7 @@
     window.__openPwGate=openPwGate;
     if(el("pwNew")) el("pwNew").addEventListener("input", pwRules);
     if(el("pwCancel")) el("pwCancel").addEventListener("click", function(){ if(!__pwForced) el("pwGate").hidden=true; });
+    if(el("pwLogout")) el("pwLogout").addEventListener("click", function(){ try{ localStorage.removeItem("loggedInUser"); localStorage.removeItem("netform_session"); sessionStorage.removeItem("loggedInUser"); sessionStorage.removeItem("netform_session"); }catch(e){} location.reload(); });
     if(el("pwChangeBtn")) el("pwChangeBtn").addEventListener("click", function(){ openPwGate(false); });
     if(el("pwForm")) el("pwForm").addEventListener("submit", function(e){
       e.preventDefault();

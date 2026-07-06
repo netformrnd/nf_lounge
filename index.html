@@ -1259,7 +1259,7 @@
     .acct-toggle.on .sw { background: var(--amber); }
     .acct-toggle.on .sw::after { left: 16px; }
     .acct-table { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-    .acct-row { display: grid; grid-template-columns: 1.3fr 1fr 1.3fr 1.1fr .9fr; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid #eef3fa; font-size: 13.5px; }
+    .acct-row { display: grid; grid-template-columns: 1.2fr 1fr 1.05fr 1.05fr .85fr 1.25fr; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid #eef3fa; font-size: 13.5px; }
     .acct-row.head { border-top: 0; background: #f6f9fd; font-size: 11.5px; font-weight: 800; color: var(--muted); }
     .acct-row .nm { font-weight: 800; }
     .acct-row .id { color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -1268,6 +1268,23 @@
     .acct-st.done { background: #e7f6ee; color: var(--sage); }
     .acct-st.init { background: #fdf2dd; color: var(--amber); }
     .acct-row .dt { color: var(--weak); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .acct-row .lg { color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+    /* 공지 읽음 배지 + 읽음현황 모달 */
+    .notice-reads { flex: 0 0 auto; align-self: flex-start; margin-top: 2px; border: 0; background: #eef4fb; color: #417cc1; font-size: 11.5px; font-weight: 800; padding: 4px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+    .notice-reads:hover { background: #dce9f8; }
+    .rd-overlay { position: fixed; inset: 0; background: rgba(15,27,45,.5); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    .rd-card { background: #fff; border-radius: 16px; max-width: 560px; width: 100%; max-height: 82vh; overflow: auto; padding: 24px 26px; box-shadow: 0 24px 60px rgba(15,27,45,.28); }
+    .rd-card h3 { margin: 0 0 4px; font-size: 17px; font-weight: 900; color: var(--ink); }
+    .rd-sub { margin: 0 0 4px; font-size: 12.5px; color: var(--muted); }
+    .rd-sec-t { font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 18px 0 8px; }
+    .rd-list { display: flex; flex-direction: column; gap: 6px; }
+    .rd-item { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 11px; border-radius: 8px; background: #f6f9fd; }
+    .rd-item.unread { background: #fff6f4; }
+    .rd-item .rn { font-weight: 700; color: var(--ink); }
+    .rd-item .rt { color: var(--weak); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .rd-empty { font-size: 12.5px; color: var(--weak); padding: 6px 2px; }
+    .rd-close { margin-top: 20px; width: 100%; border: 0; background: var(--blue); color: #fff; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .rd-close:hover { background: #356aa8; }
     .acct-empty { padding: 24px; text-align: center; color: var(--weak); font-weight: 700; font-size: 13px; }
     .logout-btn { margin-left: 8px; border: 1px solid var(--line); background: #fff; border-radius: 9px; padding: 6px 11px; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; }
     .logout-btn:hover { border-color: var(--blue); color: var(--blue); }
@@ -2056,6 +2073,55 @@
       }, function(err){ console.error("[lounge] 공지 구독 실패:", err); });
     }
 
+    /* 공지 읽음 기록: 직원이 공지를 펼치면 lounge_notices/{id}.reads[아이디]=시각 (관리자 열람은 제외) */
+    function recordNoticeRead(n){
+      try{
+        var u=window.__loungeUser; if(!u||!u.id||!n||!n.id) return;
+        if(u.role==="admin") return;
+        var uid=String(u.id);
+        if(n.reads && n.reads[uid]) return;
+        var stamp=nowStr();
+        n.reads=n.reads||{}; n.reads[uid]=stamp;
+        if(window.__db){
+          var patch={}; patch["reads."+uid]=stamp;
+          window.__db.collection("lounge_notices").doc(String(n.id)).update(patch)
+            .catch(function(err){ console.error("[lounge] 읽음 기록 실패:", err); });
+        }
+      }catch(e){}
+    }
+    /* 관리자용: 공지별 읽음 현황 모달 (읽은 사람 / 안 읽은 사람) */
+    function openNoticeReads(n){
+      var roster=(window.__loungeUsers&&window.__loungeUsers.length)?window.__loungeUsers.slice():[];
+      roster=roster.filter(function(u){ return u && u.active!==false && u.role!=="admin"; });
+      roster.sort(function(a,b){ return (a.dept||"").localeCompare(b.dept||"","ko")||(a.name||"").localeCompare(b.name||"","ko"); });
+      var reads=n.reads||{}, rosterIds={}, readArr=[], unreadArr=[];
+      roster.forEach(function(u){ var uid=String(u.id); rosterIds[uid]=1; if(reads[uid]) readArr.push({name:u.name,dept:u.dept,at:reads[uid]}); else unreadArr.push({name:u.name,dept:u.dept}); });
+      Object.keys(reads).forEach(function(uid){ if(!rosterIds[uid]) readArr.push({name:uid,dept:"(명단 외)",at:reads[uid]}); });
+      readArr.sort(function(a,b){ return String(b.at||"").localeCompare(String(a.at||"")); });
+      function nameCell(r){ return h("span",{class:"rn",text:(r.name||"-")+(r.dept?(" · "+r.dept):"")}); }
+      var readList = readArr.length
+        ? h("div",{class:"rd-list"}, readArr.map(function(r){ return h("div",{class:"rd-item"},[ nameCell(r), h("span",{class:"rt",text:r.at||""}) ]); }))
+        : h("div",{class:"rd-empty",text:"아직 읽은 사람이 없습니다."});
+      var unreadList = unreadArr.length
+        ? h("div",{class:"rd-list"}, unreadArr.map(function(r){ return h("div",{class:"rd-item unread"},[ nameCell(r), h("span",{class:"rt",text:""}) ]); }))
+        : h("div",{class:"rd-empty",text:"모두 읽었습니다. 🎉"});
+      var card=h("div",{class:"rd-card"},[
+        h("h3",{text:n.title||"공지"}),
+        h("p",{class:"rd-sub",text:"읽음 "+readArr.length+"명 · 안 읽음 "+unreadArr.length+"명 (관리자 제외)"}),
+        h("div",{class:"rd-sec-t",text:"✅ 읽은 사람 ("+readArr.length+"명)"}),
+        readList,
+        h("div",{class:"rd-sec-t",text:"⬜ 안 읽은 사람 ("+unreadArr.length+"명)"}),
+        unreadList
+      ]);
+      var closeBtn=h("button",{class:"rd-close",type:"button",text:"닫기"});
+      card.appendChild(closeBtn);
+      var ov=h("div",{class:"rd-overlay"},[card]);
+      function close(){ if(ov.parentNode) ov.parentNode.removeChild(ov); }
+      closeBtn.addEventListener("click", close);
+      ov.addEventListener("click", function(e){ if(e.target===ov) close(); });
+      document.body.appendChild(ov);
+    }
+
     function noticeRow(n, opts){
       opts = opts || {};
       var main = [ h("b",null,[ n.title, n.important?h("i",{class:"imp-pill",text:"중요"}):null ]) ];
@@ -2074,6 +2140,8 @@
       }
       return row;
     }
+    /* 목록 재렌더(읽음 저장 등) 후에도 펼쳐둔 공지가 유지되도록 열림 상태 기억 */
+    var __openNotices = {};
     /* 공지 목록 아코디언 항목: 제목만 보이고 클릭하면 내용 펼침 */
     function noticeListItem(n, canDel){
       var body = h("div",{class:"notice-body",hidden:"hidden"},[
@@ -2094,15 +2162,21 @@
           deleteNoticeRecord(n.id);
         });
         headChildren.push(del);
+        var readCount = n.reads ? Object.keys(n.reads).length : 0;
+        var rbadge = h("button",{class:"notice-reads",type:"button",title:"읽음 현황 보기"}, "👁 "+readCount);
+        rbadge.addEventListener("click", function(e){ e.stopPropagation(); openNoticeReads(n); });
+        headChildren.push(rbadge);
       }
       headChildren.push(chevron);
       var head = h("div",{class:"notice-head",role:"button",tabindex:"0","aria-expanded":"false"}, headChildren);
       var item = h("div",{class:"notice-item"},[ head, body ]);
+      if(__openNotices[n.id]){ body.hidden=false; item.classList.add("open"); head.setAttribute("aria-expanded","true"); }
       function toggle(){
         var open = body.hidden;
         body.hidden = !open;
         item.classList.toggle("open", open);
         head.setAttribute("aria-expanded", open ? "true" : "false");
+        if(open){ __openNotices[n.id]=true; recordNoticeRead(n); } else { delete __openNotices[n.id]; }
       }
       head.addEventListener("click", toggle);
       head.addEventListener("keydown", function(e){
@@ -2492,6 +2566,21 @@
       }
     }
 
+    /* 최종 로그인/접속 시각 기록 (1시간 이내 중복 기록 방지) */
+    function recordLogin(u){
+      try{
+        if(!u || !u.id) return;
+        var nowMs=Date.now();
+        var prev=u.lastLoginTs?Number(u.lastLoginTs):0;
+        if(prev && (nowMs-prev)<3600000) return;
+        var stamp=nowStr();
+        u.lastLoginAt=stamp; u.lastLoginTs=nowMs;
+        if(window.__db){
+          window.__db.collection("lounge_users").doc(String(u.id)).set({ lastLoginAt:stamp, lastLoginTs:nowMs }, {merge:true})
+            .catch(function(err){ console.error("[lounge] 로그인 기록 실패:", err); });
+        }
+      }catch(e){}
+    }
     function applyUser(u){
       el("loginGate").hidden=true;
       if(el("uName")) el("uName").textContent=u.name;
@@ -2500,6 +2589,7 @@
       if(el("vWho")) el("vWho").textContent=u.name+" · "+u.dept;
       var at=el("adminTab"); if(at) at.style.display = (u.role==="admin") ? "" : "none";
       window.__loungeUser = u;                 // 권한 필터(canSeeRes)가 이 사용자 기준으로 동작
+      recordLogin(u);                          // 최종 로그인/접속 시각 기록
       if(window.__refreshGuide) window.__refreshGuide();
       if(window.__loadUserFavs) window.__loadUserFavs();   // 계정별 즐겨찾기 불러오기
       renderAdmin();
@@ -2830,7 +2920,7 @@
       mbox.appendChild(mk("div",{class:"acct-metric warn"},[mk("div",{class:"ml",text:"초기 비번"}),mk("div",{class:"mv"},[document.createTextNode(String(init)),mk("small",{text:" 명"})])]));
       // table
       clr(tbl);
-      tbl.appendChild(mk("div",{class:"acct-row head"},[mk("span",{text:"이름"}),mk("span",{text:"아이디"}),mk("span",{text:"팀"}),mk("span",{text:"상태"}),mk("span",{text:"변경일"})]));
+      tbl.appendChild(mk("div",{class:"acct-row head"},[mk("span",{text:"이름"}),mk("span",{text:"아이디"}),mk("span",{text:"팀"}),mk("span",{text:"상태"}),mk("span",{text:"변경일"}),mk("span",{text:"최종 로그인"})]));
       var ql=q.trim().toLowerCase(), shown=0;
       if(!total){ tbl.appendChild(mk("div",{class:"acct-empty",text:"공용 계정(lounge_users)이 아직 없습니다. 매출현황에서 이전(migrate) 후 표시됩니다."})); return; }
       users.forEach(function(u){
@@ -2844,7 +2934,8 @@
           mk("span",{class:"id",text:String(u.id||"")}),
           mk("span",{class:"tm",text:u.dept||""}),
           mk("span",null,[ mk("span",{class:"acct-st "+(done?"done":"init"),text:done?"✓ 변경완료":"⚠ 초기비번"}) ]),
-          mk("span",{class:"dt",text:done?(u.pwChangedAt||"-"):"—"})
+          mk("span",{class:"dt",text:done?(u.pwChangedAt||"-"):"—"}),
+          mk("span",{class:"lg",text:u.lastLoginAt||"—"})
         ]));
       });
       if(!shown) tbl.appendChild(mk("div",{class:"acct-empty",text:"조건에 맞는 직원이 없습니다."}));

@@ -2039,7 +2039,8 @@
        작성·삭제는 관리자(role:"admin")만 가능합니다. */
     var NKEY = "netform_notices";
     function noticeIsAdmin(){
-      try { var r=sessionStorage.getItem("netform_session"); if(r){ var su=JSON.parse(r); return !!(su && su.role==="admin"); } } catch(e){}
+      try { if(window.__loungeUser) return window.__loungeUser.role==="admin"; } catch(e){}
+      try { var r=sessionStorage.getItem("netform_session")||localStorage.getItem("netform_session"); if(r){ var su=JSON.parse(r); return !!(su && su.role==="admin"); } } catch(e){}
       return false;
     }
     function loadNotices(){

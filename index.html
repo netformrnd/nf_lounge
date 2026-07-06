@@ -1538,13 +1538,15 @@
     __initLoungeUsers();
   </script>
   <script>
-  /* ── 절대 2시간 자동 로그아웃 (로그인 후 2시간 경과 시, 활동 무관 · 5개 앱 공통) ── */
+  /* ── 미사용 2시간 자동 로그아웃 (마지막 활동 후 2시간 · 활동 시 타이머 리셋 · 5개 앱 공통) ── */
   (function(){
-    var TTL=7200000, KEY='loungeLoginAt';
+    var TTL=7200000, KEY='loungeLastActivity', MINW=30000;
     function now(){ return Date.now(); }
     function has(){ try{ return !!localStorage.getItem('loggedInUser'); }catch(e){ return false; } }
-    function clearS(){ try{ ['loggedInUser','netform_session',KEY,'loungeLastActivity'].forEach(function(k){localStorage.removeItem(k);}); ['loggedInUser','netform_session'].forEach(function(k){sessionStorage.removeItem(k);}); }catch(e){} }
+    function clearS(){ try{ ['loggedInUser','netform_session',KEY,'loungeLoginAt'].forEach(function(k){localStorage.removeItem(k);}); ['loggedInUser','netform_session'].forEach(function(k){sessionStorage.removeItem(k);}); }catch(e){} }
+    function touch(){ try{ if(!has())return; var l=parseInt(localStorage.getItem(KEY)||'0',10); var t=now(); if(t-l>MINW){ localStorage.setItem(KEY,String(t)); } }catch(e){} }
     try{ if(has()){ var t=parseInt(localStorage.getItem(KEY)||'0',10); if(!t){ localStorage.setItem(KEY,String(now())); } else if(now()-t>TTL){ clearS(); } } }catch(e){}
+    ['click','keydown','mousemove','scroll','touchstart','pointerdown'].forEach(function(ev){ window.addEventListener(ev, touch, {passive:true}); });
     setInterval(function(){ try{ if(!has())return; var t=parseInt(localStorage.getItem(KEY)||'0',10); if(t && now()-t>TTL){ clearS(); location.reload(); } }catch(e){} }, 60000);
   })();
   </script>

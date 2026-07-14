@@ -1272,6 +1272,8 @@
     /* 공지 읽음 배지 + 읽음현황 모달 */
     .notice-reads { flex: 0 0 auto; align-self: flex-start; margin-top: 2px; border: 0; background: #eef4fb; color: #417cc1; font-size: 11.5px; font-weight: 800; padding: 4px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
     .notice-reads:hover { background: #dce9f8; }
+    .notice-clickable { cursor: pointer; border-radius: 10px; transition: background .15s ease; }
+    .notice-clickable:hover { background: #f7faff; }
     .rd-overlay { position: fixed; inset: 0; background: rgba(15,27,45,.5); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
     .rd-card { background: #fff; border-radius: 16px; max-width: 560px; width: 100%; max-height: 82vh; overflow: auto; padding: 24px 26px; box-shadow: 0 24px 60px rgba(15,27,45,.28); }
     .rd-card h3 { margin: 0 0 4px; font-size: 17px; font-weight: 900; color: var(--ink); }
@@ -2194,7 +2196,14 @@
       if (np){
         clear(np);
         if(!noticeData.length){ np.appendChild(h("p",{class:"notice-empty",text:"등록된 공지가 없습니다."})); }
-        else { noticeData.slice(0,3).forEach(function(n){ np.appendChild(noticeRow(n,{showContent:false})); }); }
+        else { noticeData.slice(0,3).forEach(function(n){
+          var pr=noticeRow(n,{showContent:false});
+          pr.classList.add("notice-clickable"); pr.setAttribute("role","button"); pr.setAttribute("tabindex","0");
+          function goNotice(){ __openNotices[n.id]=true; recordNoticeRead(n); renderNotices(); if(window.__goView) window.__goView("notice"); }
+          pr.addEventListener("click", goNotice);
+          pr.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); goNotice(); } });
+          np.appendChild(pr);
+        }); }
       }
       var nl = el("noticeList");
       if (nl){
@@ -2295,6 +2304,7 @@
         showView(v); setActiveView(v);
       });
     }
+    window.__goView = function(v){ showView(v); setActiveView(v); };
   })();
   </script>
 

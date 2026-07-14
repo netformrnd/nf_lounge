@@ -2074,11 +2074,10 @@
       }, function(err){ console.error("[lounge] 공지 구독 실패:", err); });
     }
 
-    /* 공지 읽음 기록: 직원이 공지를 펼치면 lounge_notices/{id}.reads[아이디]=시각 (관리자 열람은 제외) */
+    /* 공지 읽음 기록: 누구든 공지를 펼치면 lounge_notices/{id}.reads[아이디]=시각 (여는 사람 모두 기록) */
     function recordNoticeRead(n){
       try{
         var u=window.__loungeUser; if(!u||!u.id||!n||!n.id) return;
-        if(u.role==="admin") return;
         var uid=String(u.id);
         if(n.reads && n.reads[uid]) return;
         var stamp=nowStr();
@@ -2092,13 +2091,17 @@
     }
     /* 관리자용: 공지별 읽음 현황 모달 (읽은 사람 / 안 읽은 사람) */
     function openNoticeReads(n){
-      var roster=(window.__loungeUsers&&window.__loungeUsers.length)?window.__loungeUsers.slice():[];
-      roster=roster.filter(function(u){ return u && u.active!==false && u.role!=="admin"; });
+      var all=(window.__loungeUsers&&window.__loungeUsers.length)?window.__loungeUsers.slice():[];
+      var byId={}; all.forEach(function(u){ if(u&&u.id!=null) byId[String(u.id)]=u; });
+      /* '안 읽음' 대상 = 활성 직원(관리자 제외) */
+      var roster=all.filter(function(u){ return u && u.active!==false && u.role!=="admin"; });
       roster.sort(function(a,b){ return (a.dept||"").localeCompare(b.dept||"","ko")||(a.name||"").localeCompare(b.name||"","ko"); });
-      var reads=n.reads||{}, rosterIds={}, readArr=[], unreadArr=[];
-      roster.forEach(function(u){ var uid=String(u.id); rosterIds[uid]=1; if(reads[uid]) readArr.push({name:u.name,dept:u.dept,at:reads[uid]}); else unreadArr.push({name:u.name,dept:u.dept}); });
-      Object.keys(reads).forEach(function(uid){ if(!rosterIds[uid]) readArr.push({name:uid,dept:"(명단 외)",at:reads[uid]}); });
+      var reads=n.reads||{};
+      /* 읽은 사람 = reads에 기록된 모든 사람(관리자 포함) */
+      var readArr=Object.keys(reads).map(function(uid){ var u=byId[uid]; return { name:(u&&u.name)||uid, dept:(u&&(u.dept||u.team))||"", at:reads[uid] }; });
       readArr.sort(function(a,b){ return String(b.at||"").localeCompare(String(a.at||"")); });
+      /* 안 읽은 사람 = 활성 직원 중 reads에 없는 사람 */
+      var unreadArr=roster.filter(function(u){ return !reads[String(u.id)]; }).map(function(u){ return { name:u.name, dept:u.dept||u.team||"" }; });
       function nameCell(r){ return h("span",{class:"rn",text:(r.name||"-")+(r.dept?(" · "+r.dept):"")}); }
       var readList = readArr.length
         ? h("div",{class:"rd-list"}, readArr.map(function(r){ return h("div",{class:"rd-item"},[ nameCell(r), h("span",{class:"rt",text:r.at||""}) ]); }))
@@ -2108,7 +2111,7 @@
         : h("div",{class:"rd-empty",text:"모두 읽었습니다. 🎉"});
       var card=h("div",{class:"rd-card"},[
         h("h3",{text:n.title||"공지"}),
-        h("p",{class:"rd-sub",text:"읽음 "+readArr.length+"명 · 안 읽음 "+unreadArr.length+"명 (관리자 제외)"}),
+        h("p",{class:"rd-sub",text:"읽음 "+readArr.length+"명 · 안 읽음 "+unreadArr.length+"명 (안 읽음은 직원 기준)"}),
         h("div",{class:"rd-sec-t",text:"✅ 읽은 사람 ("+readArr.length+"명)"}),
         readList,
         h("div",{class:"rd-sec-t",text:"⬜ 안 읽은 사람 ("+unreadArr.length+"명)"}),

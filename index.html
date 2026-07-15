@@ -1220,6 +1220,8 @@
     .login-form input { width: 100%; border: 1.5px solid #e2eaf6; background: #f6f9fe; border-radius: 14px; padding: 13px 16px; font-size: 14px; font-family: inherit; color: #1f3a5f; outline: none; transition: border-color .15s, box-shadow .15s, background .15s; }
     .login-form input::placeholder { color: #aebfd4; }
     .login-form input:focus { border-color: #5b9be8; background: #fff; box-shadow: 0 0 0 4px rgba(91,155,232,.14); }
+    .login-remember { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #7d92ad; font-weight: 700; cursor: pointer; user-select: none; margin: -2px 2px 0; }
+    .login-remember input { width: 16px; height: 16px; margin: 0; accent-color: #3f7cc1; cursor: pointer; }
     .login-form button { margin-top: 8px; border: 0; background: linear-gradient(135deg,#5b9be8,#3f7cc1); color: #fff; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 900; letter-spacing: .5px; cursor: pointer; box-shadow: 0 12px 26px rgba(63,124,193,.3); transition: transform .12s, box-shadow .15s, filter .15s; }
     .login-form button:hover { filter: brightness(1.05); box-shadow: 0 16px 32px rgba(63,124,193,.4); transform: translateY(-1px); }
     .login-form button:active { transform: translateY(1px); }
@@ -1580,6 +1582,7 @@
       <form id="loginForm" class="login-form">
         <label class="login-field"><span>아이디</span><input id="loginId" placeholder="생년월일 6자리 (YYMMDD)" autocomplete="username" /></label>
         <label class="login-field"><span>비밀번호</span><input id="loginPw" type="password" placeholder="비밀번호" autocomplete="current-password" /></label>
+        <label class="login-remember"><input type="checkbox" id="rememberId" /><span>아이디 저장</span></label>
         <button type="submit">로그인</button>
         <p id="loginErr" class="login-err" hidden>아이디 또는 비밀번호를 확인해주세요.</p>
       </form>
@@ -2660,10 +2663,13 @@
       authenticateUser(id, pw).then(function(u){
         if(!u){ el("loginErr").hidden=false; return; }
         el("loginErr").hidden=true;
+        try{ if(el("rememberId") && el("rememberId").checked){ localStorage.setItem("lounge_rememberId","true"); localStorage.setItem("lounge_savedId", id); } else { localStorage.removeItem("lounge_rememberId"); localStorage.removeItem("lounge_savedId"); } }catch(_){}
         setSession(u);
         applyUser(u);
       }).catch(function(err){ console.error("[lounge] 로그인 오류:", err); el("loginErr").hidden=false; });
     });
+    /* 아이디 저장: 저장해둔 아이디가 있으면 자동 입력 + 체크박스 체크 */
+    (function(){ try{ if(localStorage.getItem("lounge_rememberId")==="true"){ var sid=localStorage.getItem("lounge_savedId")||""; if(el("rememberId")) el("rememberId").checked=true; if(sid && el("loginId")){ el("loginId").value=sid; if(el("loginPw")) el("loginPw").focus(); } } }catch(_){} })();
     if(el("logoutBtn")) el("logoutBtn").addEventListener("click",function(){ localStorage.removeItem(SSO_KEY); localStorage.removeItem(SES); sessionStorage.removeItem(SSO_KEY); sessionStorage.removeItem(SES); location.reload(); });
     /* Firestore 공용계정이 늦게 도착하면, 이미 로그인한 사용자 정보를 그 시점에 다시 반영 */
     window.__onUsersLoaded=function(){ var u=curUser(); if(u){ window.__loungeUser=u; var __g=el("loginGate"); if(__g && !__g.hidden){ applyUser(u); } else { if(window.__refreshGuide) window.__refreshGuide(); } if(window.__loadUserFavs) window.__loadUserFavs(); } };

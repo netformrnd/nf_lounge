@@ -2088,8 +2088,9 @@
         var stamp=nowStr();
         n.reads=n.reads||{}; n.reads[uid]=stamp;
         if(window.__db){
-          var patch={}; patch["reads."+uid]=stamp;
-          window.__db.collection("lounge_notices").doc(String(n.id)).update(patch)
+          /* 아이디가 숫자로 시작(생년월일)이라 update 점표기 대신 set+merge로 저장 */
+          var readsObj={}; readsObj[uid]=stamp;
+          window.__db.collection("lounge_notices").doc(String(n.id)).set({ reads: readsObj }, {merge:true})
             .catch(function(err){ console.error("[lounge] 읽음 기록 실패:", err); });
         }
       }catch(e){}

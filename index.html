@@ -2085,7 +2085,9 @@
         var u=window.__loungeUser; if(!u||!u.id||!n||!n.id) return;
         var uid=String(u.id);
         if(n.reads && n.reads[uid]) return;
-        var stamp=nowStr();
+        /* nowStr()는 다른 스크립트 블록이라 여기서 접근 불가 → 시각 인라인 생성 */
+        var __d=new Date(), __p=function(x){return String(x).padStart(2,"0");};
+        var stamp=__d.getFullYear()+"-"+__p(__d.getMonth()+1)+"-"+__p(__d.getDate())+" "+__p(__d.getHours())+":"+__p(__d.getMinutes());
         n.reads=n.reads||{}; n.reads[uid]=stamp;
         if(window.__db){
           /* 아이디가 숫자로 시작(생년월일)이라 update 점표기 대신 set+merge로 저장 */

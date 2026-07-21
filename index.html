@@ -1263,6 +1263,9 @@
     .acct-table { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
     .acct-row { display: grid; grid-template-columns: 1.2fr 1fr 1.05fr 1.05fr .85fr 1.25fr; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid #eef3fa; font-size: 13.5px; }
     .acct-row.head { border-top: 0; background: #f6f9fd; font-size: 11.5px; font-weight: 800; color: var(--muted); }
+    .acct-row.head .acct-h { cursor: pointer; user-select: none; white-space: nowrap; transition: color .12s; }
+    .acct-row.head .acct-h:hover { color: var(--ink); }
+    .acct-row.head .acct-h.active { color: var(--blue); }
     .acct-row .nm { font-weight: 800; }
     .acct-row .id { color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
     .acct-row .tm { color: var(--muted); font-weight: 600; }
@@ -2928,11 +2931,28 @@
     function mk(tag,props,kids){var n=document.createElement(tag);if(props)Object.keys(props).forEach(function(k){if(k==="class")n.className=props[k];else if(k==="text")n.textContent=props[k];else n.setAttribute(k,props[k]);});(kids||[]).forEach(function(c){if(c==null)return;n.appendChild(typeof c==="string"?document.createTextNode(c):c);});return n;}
     function clr(n){while(n&&n.firstChild)n.removeChild(n.firstChild);}
     var onlyInit=false, q="";
+    var sortKey='dept', sortDir=1;
+    var COLS=[
+      {key:'name',   label:'이름',       get:function(u){return (u.name||'').toLowerCase();}, num:false},
+      {key:'id',     label:'아이디',     get:function(u){return String(u.id||'');},           num:false},
+      {key:'dept',   label:'팀',         get:function(u){return (u.dept||'').toLowerCase();}, num:false},
+      {key:'status', label:'상태',       get:function(u){return u.pwChanged===true?1:0;},      num:true},
+      {key:'changed',label:'변경일',     get:function(u){return u.pwChangedAt||'';},            num:false},
+      {key:'login',  label:'최종 로그인', get:function(u){return u.lastLoginAt||'';},            num:false}
+    ];
+    function acctCmp(a,b){
+      var col=null; for(var i=0;i<COLS.length;i++){ if(COLS[i].key===sortKey){ col=COLS[i]; break; } }
+      if(!col) col=COLS[2];
+      var va=col.get(a), vb=col.get(b), r;
+      if(col.num){ r=va-vb; } else { r=String(va).localeCompare(String(vb),'ko'); }
+      if(r===0){ r=(a.name||'').localeCompare(b.name||'','ko'); }
+      return r*sortDir;
+    }
     function metric(box,label,val,warn,color){ box.appendChild(mk("div",{class:"acct-metric"+(warn?" warn":"")},[mk("div",{class:"ml",text:label}),mk("div",{class:"mv"+(color?"":""),text:String(val)},color?[]:[])])); }
     function render(){
       var tbl=el("acctTable"); if(!tbl) return;
       var users=(window.__loungeUsers&&window.__loungeUsers.length)?window.__loungeUsers.slice():[];
-      users.sort(function(a,b){return (a.dept||"").localeCompare(b.dept||"","ko")||(a.name||"").localeCompare(b.name||"","ko");});
+      users.sort(acctCmp);
       var total=users.length;
       var changed=users.filter(function(u){return u.pwChanged===true;}).length;
       var init=total-changed;
@@ -2943,7 +2963,12 @@
       mbox.appendChild(mk("div",{class:"acct-metric warn"},[mk("div",{class:"ml",text:"초기 비번"}),mk("div",{class:"mv"},[document.createTextNode(String(init)),mk("small",{text:" 명"})])]));
       // table
       clr(tbl);
-      tbl.appendChild(mk("div",{class:"acct-row head"},[mk("span",{text:"이름"}),mk("span",{text:"아이디"}),mk("span",{text:"팀"}),mk("span",{text:"상태"}),mk("span",{text:"변경일"}),mk("span",{text:"최종 로그인"})]));
+      tbl.appendChild(mk("div",{class:"acct-row head"}, COLS.map(function(c){
+        var active=(c.key===sortKey);
+        var sp=mk("span",{class:"acct-h"+(active?" active":""),text:c.label+(active?(sortDir===1?" ▲":" ▼"):"")});
+        sp.addEventListener("click",function(){ if(sortKey===c.key){ sortDir=-sortDir; } else { sortKey=c.key; sortDir=1; } render(); });
+        return sp;
+      })));
       var ql=q.trim().toLowerCase(), shown=0;
       if(!total){ tbl.appendChild(mk("div",{class:"acct-empty",text:"공용 계정(lounge_users)이 아직 없습니다. 매출현황에서 이전(migrate) 후 표시됩니다."})); return; }
       users.forEach(function(u){
